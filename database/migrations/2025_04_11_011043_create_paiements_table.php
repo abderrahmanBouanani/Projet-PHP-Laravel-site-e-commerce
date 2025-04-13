@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('paiements', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('commande_id')->constrained()->onDelete('cascade');
+            $table->foreignId('commande_id')->constrained();
             $table->float('montant');
-            $table->enum('type', ['carte', 'paypal', 'facturation']);
+            $table->string('type'); // 'carte' ou 'paypal'
+            $table->string('numero_carte')->nullable();
+            $table->string('date_expiration')->nullable();
+            $table->string('email_paypal')->nullable();
             $table->timestamps();
         });
     }

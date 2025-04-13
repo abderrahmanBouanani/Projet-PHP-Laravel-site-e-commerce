@@ -10,8 +10,8 @@ class Livraison extends Model
     use HasFactory;
 
     protected $fillable = [
-        'commande_id', 'livreur_id', 'nom_client', 
-        'prenom_client', 'adresse_client'
+        'commande_id', 'livreur_id', 'nom_client',
+        'prenom_client', 'adresse_client', 'statut'
     ];
 
     public function commande()
@@ -21,6 +21,11 @@ class Livraison extends Model
 
     public function livreur()
     {
-        return $this->belongsTo(Livreur::class);
+        return $this->belongsTo(User::class, 'livreur_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
     }
 }

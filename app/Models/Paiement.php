@@ -9,25 +9,13 @@ class Paiement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['commande_id', 'montant', 'type'];
+    protected $fillable = [
+        'commande_id', 'montant', 'type', 
+        'numero_carte', 'date_expiration', 'email_paypal'
+    ];
 
     public function commande()
     {
         return $this->belongsTo(Commande::class);
-    }
-
-    public function carte()
-    {
-        return $this->hasOne(Carte::class);
-    }
-
-    public function paypal()
-    {
-        return $this->hasOne(Paypal::class);
-    }
-
-    public function facturation()
-    {
-        return $this->hasOne(Facturation::class);
     }
 }

@@ -10,20 +10,26 @@ class User extends Model
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['nom', 'prenom', 'email', 'password', 'type'];
+    protected $fillable = [
+        'nom', 'prenom', 'email', 'password', 'type'
+    ];
 
-    public function admin()
+    protected $hidden = [
+        'mot_de_passe', 'remember_token',
+    ];
+
+    public function produits()
     {
-        return $this->hasOne(Admin::class);
+        return $this->hasMany(Produit::class, 'vendeur_id');
     }
 
-    public function client()
+    public function commandes()
     {
-        return $this->hasOne(Client::class);
+        return $this->hasMany(Commande::class, 'client_id');
     }
 
-    public function vendeurs()
+    public function livraisons()
     {
-        return $this->hasMany(Vendeur::class);
+        return $this->hasMany(Livraison::class, 'livreur_id');
     }
 }
