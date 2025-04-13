@@ -14,7 +14,7 @@
     />
     <link href="{{ asset('assets/css/tiny-slider.css') }}" rel="stylesheet">
     <link href="{{ asset ('assets/css/style.css')}}" rel="stylesheet" />
-    <title>ShopAll - Connexion</title>
+    <title>Inscription - ShopAll</title>
     <style>
       :root {
         --primary-color: #3b5d50;
@@ -29,6 +29,7 @@
         color: var(--text-color);
       }
 
+      /* Utilisation du style navbar original */
       .custom-navbar {
         margin-bottom: 30px;
         background: #3b5d50 !important;
@@ -101,9 +102,9 @@
         width: calc(100% - 16px);
       }
 
-      /* Style du formulaire de connexion */
-      .login-container {
-        max-width: 400px;
+      /* Style du formulaire */
+      .signup-container {
+        max-width: 600px;
         margin: 50px auto;
         padding: 40px;
         background-color: var(--background-color);
@@ -111,7 +112,7 @@
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
       }
 
-      .login-container h2 {
+      .signup-container h2 {
         color: var(--primary-color);
         margin-bottom: 30px;
         text-align: center;
@@ -127,19 +128,21 @@
         font-weight: 500;
       }
 
-      .form-control {
+      .form-control,
+      .form-select {
         padding: 12px;
         border-radius: 8px;
         border: 1px solid #dee2e6;
         transition: all 0.3s ease;
       }
 
-      .form-control:focus {
+      .form-control:focus,
+      .form-select:focus {
         border-color: var(--primary-color);
         box-shadow: 0 0 0 0.2rem rgba(59, 93, 80, 0.25);
       }
 
-      .btn-login {
+      .btn-signup {
         background-color: var(--primary-color);
         color: white;
         padding: 12px;
@@ -150,23 +153,42 @@
         transition: all 0.3s ease;
       }
 
-      .btn-login:hover {
+      .btn-signup:hover {
         background-color: #2c4a3e;
         transform: translateY(-1px);
       }
 
-      .login-footer {
+      .popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
         text-align: center;
-        margin-top: 20px;
+        z-index: 1000;
       }
 
-      .login-footer a {
+      .popup h3 {
         color: var(--primary-color);
-        text-decoration: none;
+        margin-bottom: 20px;
       }
 
-      .login-footer a:hover {
-        text-decoration: underline;
+      .popup button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .popup button:hover {
+        background-color: #2c4a3e;
       }
     </style>
   </head>
@@ -177,7 +199,7 @@
       arial-label="ShopAll navigation bar"
     >
       <div class="container">
-        <a class="navbar-brand" href="index.html">ShopAll<span>.</span></a>
+        <a class="navbar-brand" href="signup.html">ShopAll<span>.</span></a>
 
         <button
           class="navbar-toggler"
@@ -193,10 +215,10 @@
 
         <div class="collapse navbar-collapse" id="navbarsShopAll">
           <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-            <li><a class="nav-link" href="about.html">À Propos</a></li>
+            <li><a class="nav-link" href="about.html">A Propos</a></li>
             <li><a class="nav-link" href="services.html">Services</a></li>
             <li><a class="nav-link" href="blog.html">Blog</a></li>
-            <li><a class="nav-link" href="contact.html">Contactez-nous</a></li>
+            <li><a class="nav-link" href="contact.html">Contacter nous</a></li>
           </ul>
         </div>
       </div>
@@ -204,11 +226,40 @@
     <!-- End Header/Navigation -->
 
     <div class="container">
-      <div class="login-container">
-        <h2>Connexion</h2>
-        <form id="loginForm">
+      <div class="signup-container">
+        <h2>Créer un compte</h2>
+        <form id="signupForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label" for="nom">Nom</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nom"
+                  name="nom"
+                  placeholder="Entrez votre nom"
+                  required
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label class="form-label" for="prenom">Prénom</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="prenom"
+                  name="prenom"
+                  placeholder="Entrez votre prénom"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
           <div class="form-group">
-            <label for="email" class="form-label">Email</label>
+            <label class="form-label" for="email">Email</label>
             <input
               type="email"
               class="form-control"
@@ -218,83 +269,108 @@
               required
             />
           </div>
+
           <div class="form-group">
-            <label for="password" class="form-label">Mot de passe</label>
+            <label class="form-label" for="motdepasse">Mot de passe</label>
             <input
               type="password"
               class="form-control"
-              id="password"
-              name="password"
+              id="motdepasse"
+              name="motdepasse"
               placeholder="Entrez votre mot de passe"
               required
             />
           </div>
-          <button type="submit" class="btn-login">Se connecter</button>
+
+          <div class="form-group">
+            <label class="form-label" for="telephone"
+              >Numéro de téléphone</label
+            >
+            <input
+              type="tel"
+              class="form-control"
+              id="telephone"
+              name="telephone"
+              placeholder="Entrez votre numéro de téléphone"
+              pattern="^\+?\d{10,15}$"
+              title="Le numéro de téléphone doit comporter entre 10 et 15 chiffres"
+              required
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="type_utilisateur"
+              >Type d'utilisateur</label
+            >
+            <select
+              class="form-select"
+              id="type_utilisateur"
+              name="type_utilisateur"
+              required
+            >
+              <option value="">Choisir le type d'utilisateur</option>
+              <option value="client">Client</option>
+              <option value="Vendeur">Vendeur</option>
+              <option value="Livreur">Livreur</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-signup">S'inscrire</button>
         </form>
-        <div class="login-footer">
-          <p>
-            Vous n'avez pas de compte ?
-            <a href="{{ url('/signup') }}">Créer un compte</a>
-          </p>
-        </div>
       </div>
     </div>
 
-    <script src="{{ asset('assets/js/bootstrap.bundle.min.js')}}"></script>
-    <script src="{{ asset('assets/js/tiny-slider.js')}}"></script>
-    <script src="{{ asset('assets/js/custom.js')}}"></script>
+    <div id="popup" class="popup">
+      <h3>Votre compte a bien été créé !</h3>
+      <button id="redirectButton">OK</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       document
-        .getElementById("loginForm")
+        .getElementById("signupForm")
         .addEventListener("submit", function (event) {
           event.preventDefault();
 
-          const emailInput = document.getElementById("email").value.trim();
-          const passwordInput = document
-            .getElementById("password")
-            .value.trim();
+          const nom = document.getElementById("nom").value;
+          const prenom = document.getElementById("prenom").value;
+          const emailInput = document.getElementById("email").value;
+          const passInput = document.getElementById("motdepasse").value;
+          const tel = document.getElementById("telephone").value;
+          const type = document.getElementById("type_utilisateur").value;
 
-          // Check for admin credentials first
-          if (
-            emailInput === "admin@gmail.com" &&
-            passwordInput === "admin123"
-          ) {
-            const adminUser = {
-              email: emailInput,
-              type_utilisateur: "administrateur",
-            };
-            localStorage.setItem("connectedUser", JSON.stringify(adminUser));
-            window.location.href = "{{url('/admin_home')}}";
+          if (!nom || !prenom || !emailInput || !passInput || !tel || !type) {
+            alert("Veuillez remplir tous les champs");
             return;
           }
 
-          // If not admin, check local storage for other users
           const users = JSON.parse(localStorage.getItem("users")) || [];
 
-          const user = users.find(
-            (user) =>
-              user.email === emailInput && user.motdepasse === passwordInput
-          );
-
-          if (user) {
-            localStorage.setItem("connectedUser", JSON.stringify(user));
-
-            switch (user.type_utilisateur) {
-              case "client":
-                window.location.href = "client-interface/index.html";
-                break;
-              case "Vendeur":
-                window.location.href = "vendeur-interface/vendeurHome.html";
-                break;
-              case "Livreur":
-                window.location.href = "delivery interface/livraisons.html";
-                break;
-              default:
-                alert("Type d'utilisateur inconnu !");
-            }
-          } else {
-            alert("Email ou mot de passe incorrect !");
+          if (users.some((user) => user.email === emailInput)) {
+            alert("Cet email est déjà utilisé");
+            return;
           }
+
+          const newUser = {
+            nom,
+            prenom,
+            email: emailInput,
+            motdepasse: passInput,
+            telephone: tel,
+            type_utilisateur: type,
+          };
+          users.push(newUser);
+
+          localStorage.setItem("users", JSON.stringify(users));
+
+          const popup = document.getElementById("popup");
+          popup.style.display = "block";
+
+          document
+            .getElementById("redirectButton")
+            .addEventListener("click", function () {
+              window.location.href = "login.html";
+            });
         });
     </script>
   </body>
