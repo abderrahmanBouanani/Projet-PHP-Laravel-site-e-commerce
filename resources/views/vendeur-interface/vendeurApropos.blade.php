@@ -6,64 +6,66 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <link rel="shortcut icon" href="../favicon.png" />
+    <link rel="shortcut icon" href="{{ asset('images/favicon.png')}}" />
 
     <meta name="description" content="" />
     <meta name="keywords" content="bootstrap, bootstrap4" />
 
     <!-- Bootstrap CSS -->
-    <link href="../css/bootstrap.min.css" rel="stylesheet" />
+    <link href="{{ asset('assets/css/bootstrap.min.css')}}" rel="stylesheet" />
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
       rel="stylesheet"
     />
-    <link href="../css/tiny-slider.css" rel="stylesheet" />
-    <link href="../css/style.css" rel="stylesheet" />
-    <title>ShopAll - Home</title>
+    <link href="{{ asset('assets/css/tiny-slider.css')}}" rel="stylesheet" />
+    <link href="{{ asset('assets/css/style.css')}}" rel="stylesheet" />
+    <title>ShopAll - Plateforme E-commerce polyvalente</title>
   </head>
 
   <body>
-    <!-- Start Header/Navigation -->
+    <!-- Début de l'en-tête/Navigation -->
     <nav
       class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark"
-      arial-label="Furni navigation bar"
+      arial-label="Barre de navigation ShopAll"
     >
       <div class="container">
-        <a class="navbar-brand" href="vendeurHome.html">ShopAll<span>.</span></a>
+        <a class="navbar-brand" href="{{ url('/vendeur_home')}}">ShopAll<span>.</span></a>
 
         <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target="#navbarsFurni"
-          aria-controls="navbarsFurni"
+          data-bs-target="#navbarsShopAll"
+          aria-controls="navbarsShopAll"
           aria-expanded="false"
-          aria-label="Toggle navigation"
+          aria-label="Basculer la navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarsFurni">
           <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-            <li class="nav-item active">
-              <a class="nav-link" href="vendeurHome.html">Accueil</a>
+            <li>
+              <a class="nav-link" href="{{ url('/vendeur_home')}}">Accueil</a>
             </li>
             <li>
-              <a class="nav-link" href="vendeurBoutique.html">Ma Boutique</a>
+              <a class="nav-link" href="{{ url('/vendeur_shop')}}">Ma Boutique</a>
             </li>
-            <li><a class="nav-link" href="vendeurApropos.html">À propos</a></li>
-            <li><a class="nav-link" href="vendeurService.html">Services</a></li>
-            <li><a class="nav-link" href="vendeurContact.html">Contact</a></li>
+            <li class="nav-item active">
+              <a class="nav-link" href="{{ url('/vendeur_about')}}">À propos</a>
+            </li>
+            <li><a class="nav-link" href="{{ url('/vendeur_service')}}">Services</a></li>
+            <li><a class="nav-link" href="{{ url('/vendeur_contact')}}">Contact</a></li>
           </ul>
 
           <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
             <li>
-              <a class="nav-link" href="vendeurProfile.html"
+              <a class="nav-link" href="{{ url('/vendeur_profile')}}"
                 ><img src="../images/user.svg"
               /></a>
             </li>
             <li>
-              <a class="nav-link" href="../login.html"
+              <a class="nav-link" href="{{ url('/')}}"
                 ><img
                   src="../images/logout2.png"
                   style="height: 30px; width: 30px; margin-left: 15px"
@@ -73,127 +75,45 @@
         </div>
       </div>
     </nav>
-    <!-- End Header/Navigation -->
+    <!-- Fin de l'en-tête/Navigation -->
 
-    <!-- Start Hero Section -->
+    <!-- Début de la section Héros -->
     <div class="hero">
       <div class="container">
         <div class="row justify-content-between">
           <div class="col-lg-5">
             <div class="intro-excerpt">
-              <h1>
-                Espaces Élégants <span clsas="d-block">d'Outils Modernes</span>
-              </h1>
+              <h1>À propos de nous</h1>
               <p class="mb-4">
-                votre destination en ligne pour découvrir une large gamme de
-                produits de qualité à des prix compétitifs. Profitez d’une
-                expérience d’achat simple, rapide et sécurisée, avec des
-                promotions exclusives et une livraison à votre porte.
+                Découvrez notre plateforme dédiée à vous offrir des produits de
+                qualité et un service exceptionnel.
               </p>
               <p>
-                <a href="shop.html" class="btn btn-secondary me-2"
-                  >Vendre maintenant</a
+                <a href="" class="btn btn-secondary me-2">Acheter maintenant</a
                 ><a href="#" class="btn btn-white-outline">Explorer</a>
               </p>
             </div>
           </div>
           <div class="col-lg-7">
             <div class="hero-img-wrap">
-              <img
-                src="../images/1-removebg-preview.png.png"
-                class="img-fluid"
-                style="width: 1500px; margin-top: 20px"
-              />
+              <img src="../images/couch.png" class="img-fluid" />
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- End Hero Section -->
+    <!-- Fin de la section Héros -->
 
-    <!-- Start Product Section -->
-    <div class="product-section">
-      <div class="container">
-        <div class="row">
-          <!-- Start Column 1 -->
-          <div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
-            <h2 class="mb-4 section-title">
-              Conçu avec des matériaux d'excellence.
-            </h2>
-            <p class="mb-4">
-              Nos produits sont soigneusement fabriqués à partir de matériaux de
-              qualité supérieure, sélectionnés pour leur durabilité, leur
-              performance et leur élégance. Chaque détail est pensé pour offrir
-              une expérience exceptionnelle, alliant esthétique et fiabilité.
-            </p>
-            <p><a href="shop.html" class="btn">Explorer</a></p>
-          </div>
-          <!-- End Column 1 -->
-
-          <!-- Start Column 2 -->
-          <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-            <a class="product-item" href="shop.html">
-              <img
-                src="../images/pc1.jpg"
-                class="img-fluid product-thumbnail"
-                style="mix-blend-mode: multiply"
-              />
-              <h3 class="product-title">MSI</h3>
-              <strong class="product-price">11500.00 DH</strong>
-
-              <span class="icon-cross">
-                <img src="../images/cross.svg" class="img-fluid" />
-              </span>
-            </a>
-          </div>
-          <!-- End Column 2 -->
-
-          <!-- Start Column 3 -->
-          <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-            <a class="product-item" href="shop.html">
-              <img
-                src="../images/product-2.png"
-                class="img-fluid product-thumbnail"
-              />
-              <h3 class="product-title">Kruzo Aero Chair</h3>
-              <strong class="product-price">400.00 DH</strong>
-
-              <span class="icon-cross">
-                <img src="../images/cross.svg" class="img-fluid" />
-              </span>
-            </a>
-          </div>
-          <!-- End Column 3 -->
-
-          <!-- Start Column 4 -->
-          <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
-            <a class="product-item" href="shop.html">
-              <img
-                src="../images/montre1.jpg"
-                class="img-fluid product-thumbnail"
-                style="mix-blend-mode: multiply"
-              />
-              <h3 class="product-title">World Time</h3>
-              <strong class="product-price">5000.00 DH</strong>
-
-              <span class="icon-cross">
-                <img src="../images/cross.svg" class="img-fluid" />
-              </span>
-            </a>
-          </div>
-          <!-- End Column 4 -->
-        </div>
-      </div>
-    </div>
-    <!-- End Product Section -->
-
-    <!-- Start Why Choose Us Section -->
+    <!-- Début de la section Pourquoi nous choisir -->
     <div class="why-choose-section">
       <div class="container">
-        <div class="row justify-content-between">
+        <div class="row justify-content-between align-items-center">
           <div class="col-lg-6">
             <h2 class="section-title">Pourquoi nous choisir</h2>
-            <p>Vivez dans la simplicité pour atteindre vos objectifs..</p>
+            <p>
+              Nous nous engageons à offrir une large gamme de produits de
+              qualité et une expérience d'achat fluide à nos clients.
+            </p>
 
             <div class="row my-5">
               <div class="col-6 col-md-6">
@@ -201,10 +121,10 @@
                   <div class="icon">
                     <img src="../images/truck.svg" alt="Image" class="imf-fluid" />
                   </div>
-                  <h3>Rapide &amp; Livraison gratuite</h3>
+                  <h3>Livraison rapide et gratuite</h3>
                   <p>
-                    Vivez avec de la simplicité pour atteindre vos objectifs,
-                    tout en gardant la motivation et une relation de respect.
+                    Profitez d'une livraison rapide et gratuite pour tous vos
+                    achats.
                   </p>
                 </div>
               </div>
@@ -214,10 +134,10 @@
                   <div class="icon">
                     <img src="../images/bag.svg" alt="Image" class="imf-fluid" />
                   </div>
-                  <h3>Facile à magasiner</h3>
+                  <h3>Facile à acheter</h3>
                   <p>
-                    Vivez avec des besoins simples d'amélioration positive de
-                    votre communauté directe.
+                    Notre processus d'achat est simple et intuitif pour votre
+                    commodité.
                   </p>
                 </div>
               </div>
@@ -231,9 +151,10 @@
                       class="imf-fluid"
                     />
                   </div>
-                  <h3>24/7 Support</h3>
+                  <h3>Support 24/7</h3>
                   <p>
-                    Vivez avec de la simplicité pour atteindre vos objectifs.
+                    Notre équipe de support est disponible 24/7 pour répondre à
+                    vos questions.
                   </p>
                 </div>
               </div>
@@ -248,7 +169,10 @@
                     />
                   </div>
                   <h3>Retours sans tracas</h3>
-                  <p>Adoptez la simplicité pour favoriser votre progression.</p>
+                  <p>
+                    Nous offrons une politique de retour simple pour votre
+                    tranquillité d'esprit.
+                  </p>
                 </div>
               </div>
             </div>
@@ -266,63 +190,87 @@
         </div>
       </div>
     </div>
-    <!-- End Why Choose Us Section -->
+    <!-- Fin de la section Pourquoi nous choisir -->
 
-    <!-- Start We Help Section -->
-    <div class="we-help-section">
+    <!-- Début de la section Équipe -->
+    <div class="untree_co-section">
       <div class="container">
-        <div class="row justify-content-between">
-          <div class="col-lg-7 mb-5 mb-lg-0">
-            <div class="imgs-grid">
-              <div class="grid grid-1">
-                <img
-                  src="https://m.media-amazon.com/images/I/71EWAUphg2L._AC_UY327_FMwebp_QL65_.jpg"
-                  alt="Untree.co"
-                  style="mix-blend-mode: multiply"
-                />
-              </div>
-              <div class="grid grid-2">
-                <img src="../images/img-grid-3.jpg" alt="Untree.co" />
-              </div>
-              <div class="grid grid-3">
-                <img
-                  src="https://m.media-amazon.com/images/I/61l5+LvEhcL._AC_UL480_FMwebp_QL65_.jpg"
-                  alt="Untree.co"
-                  style="margin-bottom: 10px; mix-blend-mode: multiply"
-                />
-              </div>
-            </div>
+        <div class="row mb-5">
+          <div class="col-lg-5 mx-auto text-center">
+            <h2 class="section-title">Notre Équipe</h2>
           </div>
-          <div class="col-lg-5 ps-lg-5">
-            <h2 class="section-title mb-4">
-              Nous vous aidons de trouver ce que vous voulez
-            </h2>
-            <p>
-              Faites en sorte que la facilité vienne à travers une approche
-              simple à améliorer. Rechercher la correction quotidienne avec
-              effort modéré.
-            </p>
+        </div>
 
-            <ul class="list-unstyled custom-list my-4">
-              <li>
-                Vivez avec une simplification radical de votre organisation
-              </li>
-              <li>
-                Cherchez à équilibrer vos efforts pour maximiser les résultats
-              </li>
-              <li>Adoptez une approche fluide pour surmonter les défis</li>
-              <li>
-                Simplifiez vos méthodes pour favoriser une meilleure exécution
-              </li>
-            </ul>
-            <p><a href="shop.html" class="btn">Explorer</a></p>
+        <div class="row">
+          <!-- Début Colonne 1 -->
+          <div class="col-12 col-md-6 col-lg-4 mb-5 mb-md-0">
+            <img src="../images/user-img.png" class="img-fluid mb-5" />
+            <h3 clas>
+              <a href="#"><span class="">Abderrahman</span> Bouanani</a>
+            </h3>
+            <span class="d-block position mb-4"
+              >Étudiant, ENS Marrakech CLE Info S5</span
+            >
+            <p>
+              Passionné par l'informatique et le développement, Abderrahman
+              apporte une perspective fraîche à notre équipe.
+            </p>
+            <p class="mb-0">
+              <a href="#" class="more dark"
+                >En savoir plus <span class="icon-arrow_forward"></span
+              ></a>
+            </p>
           </div>
+          <!-- Fin Colonne 1 -->
+
+          <!-- Début Colonne 2 -->
+          <div class="col-12 col-md-6 col-lg-4 mb-5 mb-md-0">
+            <img src="../images/user-img.png" class="img-fluid mb-5" />
+
+            <h3 clas>
+              <a href="#"><span class="">Amine</span> Abou-Laiche</a>
+            </h3>
+            <span class="d-block position mb-4"
+              >Étudiant, ENS Marrakech CLE Info S5</span
+            >
+            <p>
+              Amine excelle dans la résolution de problèmes et apporte une
+              expertise technique précieuse à nos projets.
+            </p>
+            <p class="mb-0">
+              <a href="#" class="more dark"
+                >En savoir plus <span class="icon-arrow_forward"></span
+              ></a>
+            </p>
+          </div>
+          <!-- Fin Colonne 2 -->
+
+          <!-- Début Colonne 3 -->
+          <div class="col-12 col-md-6 col-lg-4 mb-5 mb-md-0">
+            <img src="../images/user-img.png" class="img-fluid mb-5" />
+            <h3 clas>
+              <a href="#"><span class="">Prof. Oumaima</span> Stitini</a>
+            </h3>
+            <span class="d-block position mb-4"
+              >Professeur encadrant, Spécialiste en IA</span
+            >
+            <p>
+              Le Prof. Stitini guide notre équipe avec son expertise en IA,
+              inspirant l'innovation dans nos projets.
+            </p>
+            <p class="mb-0">
+              <a href="#" class="more dark"
+                >En savoir plus <span class="icon-arrow_forward"></span
+              ></a>
+            </p>
+          </div>
+          <!-- Fin Colonne 3 -->
         </div>
       </div>
     </div>
-    <!-- End We Help Section -->
+    <!-- Fin de la section Équipe -->
 
-    <!-- Start Testimonial Slider -->
+    <!-- Début du Slider de Témoignages -->
     <div class="testimonial-section before-footer-section">
       <div class="container">
         <div class="row">
@@ -443,98 +391,7 @@
     </div>
     <!-- Fin du Slider de Témoignages -->
 
-    <!-- Start Blog Section -->
-    <div class="blog-section">
-      <div class="container">
-        <div class="row mb-5">
-          <div class="col-md-6">
-            <h2 class="section-title">Blog</h2>
-          </div>
-          <div class="col-md-6 text-start text-md-end"></div>
-        </div>
-
-        <div class="row">
-          <div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
-            <div class="post-entry">
-              <a href="#" class="post-thumbnail"
-                ><img
-                  src="https://m.media-amazon.com/images/I/71A3uOhqVmL._AC_UY327_FMwebp_QL65_.jpg"
-                  alt="Image"
-                  class="img-fluid"
-                  style="mix-blend-mode: multiply"
-              /></a>
-              <div class="post-content-entry">
-                <h3>
-                  <a href="#"
-                    >Découvrez nos ordinateurs spécialement conçus pour les
-                    primo-accédants
-                  </a>
-                </h3>
-                <div class="meta">
-                  <span>by <a href="#">Kristin Watson</a></span>
-                  <span>on <a href="#">Dec 19, 2021</a></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
-            <div class="post-entry">
-              <a href="#" class="post-thumbnail"
-                ><img
-                  src="https://m.media-amazon.com/images/I/61VqPRU2-UL._AC_UL480_FMwebp_QL65_.jpg"
-                  alt="Image"
-                  class="img-fluid"
-                  style="
-                    mix-blend-mode: multiply;
-                    height: 300px;
-                    margin-left: 60px;
-                  "
-              /></a>
-              <div class="post-content-entry">
-                <h3>
-                  <a href="#"
-                    >Des chaises confortables et stylées, parfaites pour un
-                    premier aménagement !</a
-                  >
-                </h3>
-                <div class="meta">
-                  <span>by <a href="#">Robert Fox</a></span>
-                  <span>on <a href="#">Dec 15, 2021</a></span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-12 col-sm-6 col-md-4 mb-4 mb-md-0">
-            <div class="post-entry">
-              <a href="#" class="post-thumbnail"
-                ><img
-                  src="https://images-na.ssl-images-amazon.com/images/I/61JEYonZa6L._AC_UL330_SR330,330_.jpg"
-                  alt="Image"
-                  class="img-fluid"
-                  style="mix-blend-mode: multiply"
-              /></a>
-              <div class="post-content-entry">
-                <h3>
-                  <a href="#"
-                    >Des montres élégantes et abordables pour votre première
-                    collection !</a
-                  >
-                </h3>
-                <div class="meta">
-                  <span>by <a href="#">Kristin Watson</a></span>
-                  <span>on <a href="#">Dec 12, 2021</a></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- End Blog Section -->
-
-    <!-- Start Footer Section -->
+    <!-- Début de la section Pied de page -->
     <footer class="footer-section">
       <div class="container relative">
         <div class="sofa-img">
@@ -550,7 +407,7 @@
                     src="../images/envelope-outline.svg"
                     alt="Image"
                     class="img-fluid" /></span
-                ><span>Subscribe to Newsletter</span>
+                ><span>Abonnez-vous à notre newsletter</span>
               </h3>
 
               <form action="#" class="row g-3">
@@ -558,14 +415,14 @@
                   <input
                     type="text"
                     class="form-control"
-                    placeholder="Enter your name"
+                    placeholder="Entrez votre nom"
                   />
                 </div>
                 <div class="col-auto">
                   <input
                     type="email"
                     class="form-control"
-                    placeholder="Enter your email"
+                    placeholder="Entrez votre email"
                   />
                 </div>
                 <div class="col-auto">
@@ -581,13 +438,13 @@
         <div class="row g-5 mb-5">
           <div class="col-lg-4">
             <div class="mb-4 footer-logo-wrap">
-              <a href="#" class="footer-logo">Furni<span>.</span></a>
+              <a href="#" class="footer-logo">ShopAll<span>.</span></a>
             </div>
             <p class="mb-4">
-              La facilitation commence par un pur blocage du travail. Nous vous
-              offrons une alternative à cette situation. Ensemble, nous
-              trouverons une solution pour améliorer ce processus. Le confort
-              d'un Client est essentiel
+              Chez ShopAll, nous sommes passionnés par la création de meubles
+              élégants et fonctionnels pour votre maison. Notre engagement
+              envers la qualité et le design innovant fait de nous votre choix
+              idéal pour l'ameublement.
             </p>
 
             <ul class="list-unstyled custom-social">
@@ -610,35 +467,35 @@
             <div class="row links-wrap">
               <div class="col-6 col-sm-6 col-md-3">
                 <ul class="list-unstyled">
-                  <li><a href="#">About us</a></li>
+                  <li><a href="#">À propos de nous</a></li>
                   <li><a href="#">Services</a></li>
                   <li><a href="#">Blog</a></li>
-                  <li><a href="#">Contact us</a></li>
+                  <li><a href="#">Nous contacter</a></li>
                 </ul>
               </div>
 
               <div class="col-6 col-sm-6 col-md-3">
                 <ul class="list-unstyled">
                   <li><a href="#">Support</a></li>
-                  <li><a href="#">Knowledge base</a></li>
-                  <li><a href="#">Live chat</a></li>
+                  <li><a href="#">Base de connaissances</a></li>
+                  <li><a href="#">Chat en direct</a></li>
                 </ul>
               </div>
 
               <div class="col-6 col-sm-6 col-md-3">
                 <ul class="list-unstyled">
-                  <li><a href="#">Jobs</a></li>
-                  <li><a href="#">Our team</a></li>
+                  <li><a href="#">Emplois</a></li>
+                  <li><a href="#">Notre équipe</a></li>
                   <li><a href="#">Leadership</a></li>
-                  <li><a href="#">Privacy Policy</a></li>
+                  <li><a href="#">Politique de confidentialité</a></li>
                 </ul>
               </div>
 
               <div class="col-6 col-sm-6 col-md-3">
                 <ul class="list-unstyled">
-                  <li><a href="#">Nordic Chair</a></li>
+                  <li><a href="#">Chaise nordique</a></li>
                   <li><a href="#">Kruzo Aero</a></li>
-                  <li><a href="#">Ergonomic Chair</a></li>
+                  <li><a href="#">Chaise ergonomique</a></li>
                 </ul>
               </div>
             </div>
@@ -653,24 +510,27 @@
                 <script>
                   document.write(new Date().getFullYear());
                 </script>
-                . Tous droits réservés.
+                . Tous droits réservés. &mdash; Conçu avec amour par
+                <a href="https://untree.co">Untree.co</a> Distribué par
+                <a hreff="https://themewagon.com">ThemeWagon</a>
+                <!-- License information: https://untree.co/license/ -->
               </p>
             </div>
 
             <div class="col-lg-6 text-center text-lg-end">
               <ul class="list-unstyled d-inline-flex ms-auto">
-                <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li class="me-4"><a href="#">Conditions générales</a></li>
+                <li><a href="#">Politique de confidentialité</a></li>
               </ul>
             </div>
           </div>
         </div>
       </div>
     </footer>
-    <!-- End Footer Section -->
+    <!-- Fin de la section Pied de page -->
 
-    <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/tiny-slider.js"></script>
-    <script src="../js/custom.js"></script>
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{ asset('assets/js/tiny-slider.js')}}"></script>
+    <script src="{{ asset('assets/js/custom.js')}}"></script>
   </body>
 </html>

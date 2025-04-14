@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nom');
             $table->float('prix_unitaire');
             $table->string('categorie');
-            $table->text('description')->nullable();
+            $table->foreignId('vendeur_id')->constrained('users');
             $table->timestamps();
         });
     }

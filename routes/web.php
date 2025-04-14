@@ -71,3 +71,39 @@ Route::get('/admin_produit', function () {
 Route::get('/admin_utilisateur', function () {
     return view('admin-interface.Utilisateur');
 });
+
+//Routes pour le vendeur
+
+Route::get('/vendeur_home',function(){
+    return view('vendeur-interface.vendeurHome');
+});
+
+Route::get('/vendeur_about',function(){
+    return view('vendeur-interface.vendeurApropos');
+});
+
+Route::get('/vendeur_shop',function(){
+    return view('vendeur-interface.vendeurBoutique');
+});
+
+Route::get('/vendeur_contact',function(){
+    return view('vendeur-interface.vendeurContact');
+});
+
+Route::get('/vendeur_profile',function(){
+    return view('vendeur-interface.vendeurProfile');
+});
+
+Route::get('/vendeur_service',function(){
+    return view('vendeur-interface.vendeurService');
+});
+
+//Routes pour le livreur
+
+Route::get('/livreur_livraison',function(){
+    return view('delivery interface.livraisons');
+});
+
+Route::get('/livreur_profile',function(){
+    return view('delivery interface.profil-livreur');
+});

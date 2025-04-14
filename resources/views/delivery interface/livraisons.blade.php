@@ -12,27 +12,27 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="{{ asset('assets/css/livreur.css')}}" />
    
   </head>
   <body>
     <div class="sidebar">
       <nav class="custom-navbar">
-        <a class="navbar-brand" href="livraisons.html">ShopAll<span>.</span></a>
+        <a class="navbar-brand" href="{{url('/livreur_livraison')}}">ShopAll<span>.</span></a>
       </nav>
       <nav class="side-bar-content">
         <a
-          href="livraisons.html"
+          href="{{url('/livreur_livraison')}}"
           class="nav-link active d-flex align-items-center"
         >
           <i class="bi bi-truck me-2"></i>
           Livraisons
         </a>
-        <a href="profil-livreur.html" class="nav-link d-flex align-items-center">
+        <a href="{{url('/livreur_profile')}}" class="nav-link d-flex align-items-center">
           <i class="bi bi-person me-2"></i>
           Profile
         </a>
-        <a class="nav-link logout-link" href="../login.html">
+        <a class="nav-link logout-link" href="{{url('/')}}">
           <img
             src="../images/logout2.png"
             alt="Déconnexion"
@@ -122,7 +122,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="livraisons.js"></script>
+    <script src="{{ asset('assets/js/livraisons.js')}}"></script>
   </body>
 </html>
 

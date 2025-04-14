@@ -9,25 +9,34 @@ class Commande extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['client_id', 'adresse'];
+    protected $fillable = [
+        'client_id', 'adresse'
+    ];
 
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(User::class, 'client_id');
     }
 
     public function produits()
     {
-        return $this->belongsToMany(Produit::class)->withPivot('quantite');
+        return $this->belongsToMany(Produit::class, 'commande_produit')
+                    ->withPivot('quantite')
+                    ->withTimestamps();
     }
 
-    public function livraisons()
+    public function paiement()
     {
-        return $this->hasMany(Livraison::class);
+        return $this->hasOne(Paiement::class);
     }
 
-    public function paiements()
+    public function facturation()
     {
-        return $this->hasMany(Paiement::class);
+        return $this->hasOne(Facturation::class);
+    }
+
+    public function livraison()
+    {
+        return $this->hasOne(Livraison::class);
     }
 }

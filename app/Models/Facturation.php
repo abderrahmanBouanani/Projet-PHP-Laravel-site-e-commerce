@@ -10,12 +10,12 @@ class Facturation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'paiement_id', 'nom', 'prenom', 'ville', 'adresse', 
+        'commande_id', 'nom', 'prenom', 'ville', 'adresse',
         'region', 'code_postal', 'email', 'telephone', 'note_commande'
     ];
 
-    public function paiement()
+    public function commande()
     {
-        return $this->belongsTo(Paiement::class);
+        return $this->belongsTo(Commande::class);
     }
 }

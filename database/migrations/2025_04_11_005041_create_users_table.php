@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('prenom');
             $table->string('email')->unique();
             $table->string('password');
-            $table->enum('type', ['admin', 'client', 'vendeur']);
+            $table->enum('type', ['admin', 'client', 'vendeur', 'livreur']);
             $table->rememberToken();
             $table->timestamps();
         });

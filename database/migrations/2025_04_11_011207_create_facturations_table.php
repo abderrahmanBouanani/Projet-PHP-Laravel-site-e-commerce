@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('facturations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('paiement_id')->constrained()->onDelete('cascade');
+            $table->foreignId('commande_id')->constrained();
             $table->string('nom');
             $table->string('prenom');
             $table->string('ville');
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('code_postal');
             $table->string('email');
             $table->string('telephone');
-            $table->text('note_commande')->nullable();
+            $table->text('note_commande');
             $table->timestamps();
         });
     }

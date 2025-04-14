@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="shortcut icon" href="../favicon.png">
+  <link rel="shortcut icon" href="{{ asset('images/favicon.png')}}">
 
   <meta name="description" content="" />
   <meta name="keywords" content="bootstrap, bootstrap4" />
 
   <!-- Bootstrap CSS -->
-  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ asset('assets/css/bootstrap.min.css')}}" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-  <link href="../css/tiny-slider.css" rel="stylesheet">
-  <link href="../css/style.css" rel="stylesheet">
+  <link href="{{ asset('assets/css/tiny-slider.css')}}" rel="stylesheet">
+  <link href="{{ asset('assets/css/style.css')}}" rel="stylesheet">
   <title>ShopAll - Contactez-nous</title>
 </head>
 
@@ -22,7 +22,7 @@
   <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark" arial-label="Barre de navigation ShopAll">
 
     <div class="container">
-      <a class="navbar-brand" href="vendeurHome.html">ShopAll<span>.</span></a>
+      <a class="navbar-brand" href="{{url('/vendeur_home')}}">ShopAll<span>.</span></a>
 
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsShopAll" aria-controls="navbarsShopAll" aria-expanded="false" aria-label="Basculer la navigation">
         <span class="navbar-toggler-icon"></span>
@@ -32,17 +32,17 @@
 				<div class="collapse navbar-collapse" id="navbarsFurni">
 					<ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
 						<li >
-							<a class="nav-link" href="vendeurHome.html">Accueil</a>
+							<a class="nav-link" href="{{url('/vendeur_home')}}">Accueil</a>
 						</li>
-						<li><a class="nav-link" href="vendeurBoutique.html">Ma Boutique</a></li>
-						<li><a class="nav-link" href="vendeurApropos.html">À propos</a></li>
-						<li><a class="nav-link" href="vendeurService.html">Services</a></li>
-						<li class="nav-item active"><a class="nav-link" href="vendeurContact.html">Contact</a></li>
+						<li><a class="nav-link" href="{{url('/vendeur_shop')}}">Ma Boutique</a></li>
+						<li><a class="nav-link" href="{{url('/vendeur_about')}}">À propos</a></li>
+						<li><a class="nav-link" href="{{url('/vendeur_service')}}">Services</a></li>
+						<li class="nav-item active"><a class="nav-link" href="{{url('/vendeur_contact')}}">Contact</a></li>
 					</ul>
 
 					<ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-						<li><a class="nav-link" href="vendeurProfile.html"><img src="../images/user.svg"></a></li>
-						<li><a class="nav-link" href="../login.html"><img src="../images/logout2.png" style="height: 30px; width: 30px; margin-left: 15px;"></a></li>
+						<li><a class="nav-link" href="{{url('/vendeur_profile')}}"><img src="../images/user.svg"></a></li>
+						<li><a class="nav-link" href="{{url('/')}}"><img src="../images/logout2.png" style="height: 30px; width: 30px; margin-left: 15px;"></a></li>
 					</ul>
 				</div>
 			</div>
@@ -249,12 +249,12 @@
 <!-- End Footer Section -->	
 
 
-		<script src="../js/bootstrap.bundle.min.js"></script>
-		<script src="../js/tiny-slider.js"></script>
-		<script src="../js/custom.js"></script>
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="{{ asset('assets/js/tiny-slider.js')}}"></script>
+    <script src="{{ asset('assets/js/custom.js')}}"></script>
 	</body>
   
-  <script src="../js/contact.js"></script>
+  <script src="{{ asset('assets/js/contact.js')}}"></script>
 
 
 </html>

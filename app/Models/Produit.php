@@ -9,15 +9,19 @@ class Produit extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nom', 'prix_unitaire', 'categorie', 'description'];
+    protected $fillable = [
+        'nom', 'prix_unitaire', 'categorie', 'vendeur_id'
+    ];
 
-    public function vendeurs()
+    public function vendeur()
     {
-        return $this->belongsToMany(Vendeur::class);
+        return $this->belongsTo(User::class, 'vendeur_id');
     }
 
     public function commandes()
     {
-        return $this->belongsToMany(Commande::class)->withPivot('quantite');
+        return $this->belongsToMany(Commande::class, 'commande_produit')
+                    ->withPivot('quantite')
+                    ->withTimestamps();
     }
 }

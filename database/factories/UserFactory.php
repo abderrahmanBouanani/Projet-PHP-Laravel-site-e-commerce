@@ -14,7 +14,7 @@ class UserFactory extends Factory
             'prenom' => $this->faker->firstName,
             'email' => $this->faker->unique()->safeEmail,
             'password' => bcrypt('password'),
-            'type' => $this->faker->randomElement(['admin', 'client', 'vendeur']),
+            'type' => $this->faker->randomElement(['admin', 'client', 'vendeur', 'livreur']),
             'remember_token' => Str::random(10),
         ];
     }
