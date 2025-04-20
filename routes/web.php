@@ -1,10 +1,18 @@
 <?php
 
 use App\Http\Controllers\SignupController;
+use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+// Afficher le formulaire de connexion
+Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+
+// Gérer l'envoi du formulaire de connexion
+Route::post('/login', [LoginController::class, 'authenticate']);
+
+// Redirections post-login
+Route::get('/client_home', function () {
+    return view('client-interface.index');
 });
 
 // Afficher le formulaire d'inscription

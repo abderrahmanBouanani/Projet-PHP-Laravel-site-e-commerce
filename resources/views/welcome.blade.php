@@ -206,7 +206,8 @@
     <div class="container">
       <div class="login-container">
         <h2>Connexion</h2>
-        <form id="loginForm">
+        <form id="loginForm" method="POST" action="{{ url('/login') }}">
+          @csrf
           <div class="form-group">
             <label for="email" class="form-label">Email</label>
             <input
@@ -219,18 +220,27 @@
             />
           </div>
           <div class="form-group">
-            <label for="password" class="form-label">Mot de passe</label>
+            <label for="motdepasse" class="form-label">Mot de passe</label>
             <input
               type="password"
               class="form-control"
-              id="password"
-              name="password"
+              id="motdepasse"
+              name="motdepasse"
               placeholder="Entrez votre mot de passe"
               required
             />
           </div>
           <button type="submit" class="btn-login">Se connecter</button>
         </form>
+        
+        @if(session('error'))
+          <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+            {{ session('error') }}
+          </div>
+        @endif
+
+
+
         <div class="login-footer">
           <p>
             Vous n'avez pas de compte ?
@@ -243,59 +253,5 @@
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{ asset('assets/js/tiny-slider.js')}}"></script>
     <script src="{{ asset('assets/js/custom.js')}}"></script>
-    <script>
-      document
-        .getElementById("loginForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
-
-          const emailInput = document.getElementById("email").value.trim();
-          const passwordInput = document
-            .getElementById("password")
-            .value.trim();
-
-          // Check for admin credentials first
-          if (
-            emailInput === "admin@gmail.com" &&
-            passwordInput === "admin123"
-          ) {
-            const adminUser = {
-              email: emailInput,
-              type_utilisateur: "administrateur",
-            };
-            localStorage.setItem("connectedUser", JSON.stringify(adminUser));
-            window.location.href = "{{url('/admin_home')}}";
-            return;
-          }
-
-          // If not admin, check local storage for other users
-          const users = JSON.parse(localStorage.getItem("users")) || [];
-
-          const user = users.find(
-            (user) =>
-              user.email === emailInput && user.motdepasse === passwordInput
-          );
-
-          if (user) {
-            localStorage.setItem("connectedUser", JSON.stringify(user));
-
-            switch (user.type_utilisateur) {
-              case "client":
-                window.location.href = "client-interface/index.html";
-                break;
-              case "Vendeur":
-                window.location.href = "vendeur-interface/vendeurHome.html";
-                break;
-              case "Livreur":
-                window.location.href = "delivery interface/livraisons.html";
-                break;
-              default:
-                alert("Type d'utilisateur inconnu !");
-            }
-          } else {
-            alert("Email ou mot de passe incorrect !");
-          }
-        });
-    </script>
   </body>
 </html>

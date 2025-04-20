@@ -9,7 +9,7 @@ class SignupController extends Controller
 {
     public function showSignupForm()
     {
-        return view('signup'); // Assure-toi que ton fichier HTML est bien placé dans resources/views/auth/signup.blade.php
+        return view('signup'); 
     }
 
     // Gérer la soumission du formulaire d'inscription
