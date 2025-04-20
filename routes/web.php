@@ -1,14 +1,17 @@
 <?php
 
+use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/signup', function () {
-    return view('signup');
-});
+// Afficher le formulaire d'inscription
+Route::get('/signup', [SignupController::class, 'showSignupForm'])->name('signup');
+
+// Soumettre le formulaire d'inscription
+Route::post('/signup', [SignupController::class, 'create']);
 
 //Routes pour le client
 Route::get('/client_home', function () {

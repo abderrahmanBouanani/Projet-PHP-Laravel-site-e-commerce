@@ -11,11 +11,11 @@ class User extends Model
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'nom', 'prenom', 'email', 'password', 'type'
+        'nom', 'prenom', 'email', 'password','telephone', 'type'
     ];
 
     protected $hidden = [
-        'mot_de_passe', 'remember_token',
+        'password', 'remember_token',
     ];
 
     public function produits()

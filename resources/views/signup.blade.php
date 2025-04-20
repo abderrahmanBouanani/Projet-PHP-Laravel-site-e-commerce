@@ -228,7 +228,8 @@
     <div class="container">
       <div class="signup-container">
         <h2>Créer un compte</h2>
-        <form id="signupForm">
+        <form id="signupForm" method="POST" action="{{ url('/signup') }}">
+        @csrf
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
@@ -310,8 +311,8 @@
             >
               <option value="">Choisir le type d'utilisateur</option>
               <option value="client">Client</option>
-              <option value="Vendeur">Vendeur</option>
-              <option value="Livreur">Livreur</option>
+              <option value="vendeur">Vendeur</option>
+              <option value="livreur">Livreur</option>
             </select>
           </div>
 
@@ -326,52 +327,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      document
-        .getElementById("signupForm")
-        .addEventListener("submit", function (event) {
-          event.preventDefault();
 
-          const nom = document.getElementById("nom").value;
-          const prenom = document.getElementById("prenom").value;
-          const emailInput = document.getElementById("email").value;
-          const passInput = document.getElementById("motdepasse").value;
-          const tel = document.getElementById("telephone").value;
-          const type = document.getElementById("type_utilisateur").value;
-
-          if (!nom || !prenom || !emailInput || !passInput || !tel || !type) {
-            alert("Veuillez remplir tous les champs");
-            return;
-          }
-
-          const users = JSON.parse(localStorage.getItem("users")) || [];
-
-          if (users.some((user) => user.email === emailInput)) {
-            alert("Cet email est déjà utilisé");
-            return;
-          }
-
-          const newUser = {
-            nom,
-            prenom,
-            email: emailInput,
-            motdepasse: passInput,
-            telephone: tel,
-            type_utilisateur: type,
-          };
-          users.push(newUser);
-
-          localStorage.setItem("users", JSON.stringify(users));
-
-          const popup = document.getElementById("popup");
-          popup.style.display = "block";
-
-          document
-            .getElementById("redirectButton")
-            .addEventListener("click", function () {
-              window.location.href = "login.html";
-            });
-        });
-    </script>
   </body>
 </html>
