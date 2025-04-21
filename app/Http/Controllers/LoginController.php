@@ -18,10 +18,16 @@ class LoginController extends Controller
 
         // Cas spécial pour l'admin
         if ($credentials['email'] === 'admin@gmail.com' && $credentials['motdepasse'] === 'admin123') {
-            session(['connectedUser' => [
-                'email' => $credentials['email'],
-                'type_utilisateur' => 'administrateur'
-            ]]);
+            session([
+                'user' => [
+                    'id' => 0, // Admin ID
+                    'nom' => 'Admin',
+                    'prenom' => 'Super',
+                    'email' => $credentials['email'],
+                    'telephone' => 'N/A',
+                    'type' => 'admin'
+                ]
+            ]);
             return redirect('/admin_home');
         }
 
@@ -31,7 +37,16 @@ class LoginController extends Controller
                     ->first();
 
         if ($user) {
-            session(['connectedUser' => $user]);
+            session([
+                'user' => [
+                    'id' => $user->id,
+                    'nom' => $user->nom,
+                    'prenom' => $user->prenom,
+                    'email' => $user->email,
+                    'telephone' => $user->telephone,
+                    'type' => $user->type
+                ]
+            ]);
 
             switch (strtolower($user->type)) {
                 case 'client':

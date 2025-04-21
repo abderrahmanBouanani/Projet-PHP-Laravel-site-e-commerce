@@ -19,7 +19,6 @@
     <link href="{{ asset('assets/css/tiny-slider.css')}}" rel="stylesheet" />
     <link href="{{asset('assets/css/style.css')}}" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('assets/css/shop.css')}}" />
-    <script src="{{ asset('assets/js/shop.js')}}"></script>
     <title>ShopAll - Ma Boutique</title>
   </head>
 
@@ -72,55 +71,64 @@
     <!-- End Header/Navigation -->
 
     <!-- Start Hero Section -->
-    <div class="hero">
+    <form action="{{ route('vendeur.addProduct') }}" method="post" enctype="multipart/form-data">
+       @csrf
+       <div class="hero">
       <div class="container">
         <div class="row justify-content-between">
           <div class="col-lg-5">
-            <div class="intro-excerpt">
-              <h1>Ma Boutique</h1>
-              <div class="product-form mb-5">
-                <h2 style="color: white">Ajouter un Produit</h2>
-                <input
-                  type="text"
-                  id="product-name"
-                  class="form-control mb-2"
-                  placeholder="Nom du produit"
-                />
-                <input
-                  type="number"
-                  id="product-price"
-                  class="form-control mb-2"
-                  placeholder="Prix du produit"
-                />
-                <select id="product-category" class="form-control mb-2">
-                  <option value="">Sélectionnez une catégorie</option>
-                  <option value="Ordinateurs">Ordinateurs</option>
-                  <option value="Écrans">Écrans</option>
-                  <option value="Montres">Montres</option>
-                  <option value="Chaises">Chaises</option>
-                  <option value="Claviers">Claviers</option>
-                  <option value="Téléphones">Téléphones</option>
-                  <option value="MontresTactiles">Montres tactiles</option>
-                </select>
-                <input
-                  type="file"
-                  id="product-image"
-                  class="form-control mb-2"
-                  placeholder="Lien de l'image"
-                />
-                <button
-                  id="add-product"
-                  class="btn btn-primary"
-                  style="background-color: rgb(55, 142, 55)"
-                >
-                  Ajouter le produit
-                </button>
-              </div>
-            </div>
+         <div class="intro-excerpt">
+           <h1>Ma Boutique</h1>
+           <div class="product-form mb-5">
+          <h2 style="color: white">Ajouter un Produit</h2>
+          <input
+            type="text"
+            id="product-name"
+            class="form-control mb-2"
+            placeholder="Nom du produit"
+            name="nom"
+          />
+          <input
+            type="number"
+            id="product-price"
+            class="form-control mb-2"
+            placeholder="Prix du produit"
+            name="prix_unitaire"
+          />
+          <select id="product-category" class="form-control mb-2" name="categorie">
+            <option value="">Sélectionnez une catégorie</option>
+            <option value="Ordinateurs">Ordinateurs</option>
+            <option value="Écrans">Écrans</option>
+            <option value="Montres">Montres</option>
+            <option value="Chaises">Chaises</option>
+            <option value="Claviers">Claviers</option>
+            <option value="Téléphones">Téléphones</option>
+            <option value="MontresTactiles">Montres tactiles</option>
+          </select>
+          <input
+            type="file"
+            id="product-image"
+            class="form-control mb-2"
+            name="image"
+          />
+          <input type="hidden" name="vendeur_id" value="{{ Auth::id() }}" />
+          <button
+            id="add-product"
+            class="btn btn-primary"
+            style="background-color: rgb(55, 142, 55)"
+            name="add-product"
+            type="submit"
+          >
+            Ajouter le produit
+          </button>
+           </div>
+         </div>
           </div>
         </div>
       </div>
-    </div>
+       </div>
+    </form>
+    
     <!-- End Hero Section -->
 
     <!-- Start Product Table Section -->
@@ -130,16 +138,28 @@
           <div class="site-blocks-table">
             <table class="table table-bordered" id="product-table">
               <thead>
-                <tr>
-                  <th class="product-thumbnail">Image</th>
-                  <th class="product-name">Produit</th>
-                  <th class="product-price">Prix</th>
-                  <th class="product-category">Catégorie</th>
-                  <th class="product-remove">Supprimer</th>
-                </tr>
+              <tr>
+                <th class="product-thumbnail">Image</th>
+                <th class="product-name">Produit</th>
+                <th class="product-price">Prix</th>
+                <th class="product-category">Catégorie</th>
+                <th class="product-remove">Supprimer</th>
+              </tr>
               </thead>
-              <tbody id="product-list">
-                <!-- Les éléments du panier seront ajoutés ici dynamiquement -->
+              <tbody>
+              @foreach($produits as $produit)
+              <tr>
+                <td>
+                @if($produit->image)
+                  <img src="data:image/jpeg;base64,{{ base64_encode($produit->image) }}" alt="{{ $produit->nom }}" style="width: 100px; height: auto;">
+                @endif
+                </td>
+                <td>{{ $produit->nom }}</td>
+                <td>{{ number_format($produit->prix_unitaire, 2) }} DH</td>
+                <td>{{ $produit->categorie }}</td>
+                
+              </tr>
+              @endforeach
               </tbody>
             </table>
           </div>
@@ -200,92 +220,5 @@
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{ asset('assets/js/tiny-slider.js')}}"></script>
     <script src="{{ asset('assets/js/custom.js')}}"></script>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const productTableBody = document.getElementById("product-list");
-        const productNameInput = document.getElementById("product-name");
-        const productPriceInput = document.getElementById("product-price");
-        const productCategoryInput =
-          document.getElementById("product-category");
-        const productImageInput = document.getElementById("product-image");
-        const addProductButton = document.getElementById("add-product");
-
-        // Fonction pour afficher les produits
-        function renderProducts() {
-          const products = JSON.parse(localStorage.getItem("products")) || [];
-          productTableBody.innerHTML = "";
-          products.forEach((product, index) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-            <td><img src="${product.image}" class="img-fluid" alt="${product.name}" width="100" style="mix-blend-mode: multiply;"></td>
-            <td>${product.name}</td>
-            <td>${product.price} DH</td>
-            <td>${product.category}</td>
-            <td><button class="btn btn-danger btn-sm remove-product" data-index="${index}">Supprimer</button></td>
-          `;
-            productTableBody.appendChild(row);
-          });
-
-          // Ajouter des écouteurs pour la suppression
-          document.querySelectorAll(".remove-product").forEach((button) => {
-            button.addEventListener("click", (e) => {
-              const index = e.target.dataset.index;
-              removeProduct(index);
-            });
-          });
-        }
-
-        // Ajouter un produit
-        function addProduct(name, price, category, image) {
-          const product = { name, price, category, image };
-          const products = JSON.parse(localStorage.getItem("products")) || [];
-          products.push(product);
-          localStorage.setItem("products", JSON.stringify(products));
-          renderProducts();
-        }
-
-        // Supprimer un produit
-        function removeProduct(index) {
-          const products = JSON.parse(localStorage.getItem("products")) || [];
-          products.splice(index, 1);
-          localStorage.setItem("products", JSON.stringify(products));
-          renderProducts();
-        }
-
-        // Fonction pour convertir l'image en base64
-        function convertImageToBase64(file, callback) {
-          const reader = new FileReader();
-          reader.onloadend = function () {
-            callback(reader.result);
-          };
-          reader.readAsDataURL(file);
-        }
-
-        // Gestion de l'ajout d'un produit
-        addProductButton.addEventListener("click", () => {
-          const name = productNameInput.value;
-          const price = parseFloat(productPriceInput.value);
-          const category = productCategoryInput.value;
-          const imageFile = productImageInput.files[0];
-
-          if (name && price && category && imageFile) {
-            // Convertir l'image en base64 avant de l'ajouter
-            convertImageToBase64(imageFile, function (imageBase64) {
-              addProduct(name, price, category, imageBase64);
-              productNameInput.value = "";
-              productPriceInput.value = "";
-              productCategoryInput.value = "";
-              productImageInput.value = "";
-            });
-          } else {
-            alert("Veuillez remplir tous les champs.");
-          }
-        });
-
-        // Initialiser l'affichage des produits
-        renderProducts();
-      });
-    </script>
   </body>
 </html>

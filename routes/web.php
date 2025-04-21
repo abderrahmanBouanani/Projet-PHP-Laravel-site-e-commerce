@@ -3,6 +3,8 @@
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProduitController; // Ensure this controller exists in the specified namespace
+// ---connexion & signu--- 
 
 // Afficher le formulaire de connexion
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -26,6 +28,14 @@ Route::get('/client_home', function () {
     return view('client-interface.index');
 });
 
+
+//---vendeur---
+// Gérer l'envoi du formulaire d'ajout du produit
+Route::post('/produit', [ProduitController::class, 'store'])->name('vendeur.addProduct');
+
+Route::get('/vendeur_shop', [ProduitController::class, 'index'])->name('vendeur.shop');
+
+//---
 Route::get('/client_shop', function () {
     return view('client-interface.shop');
 });
@@ -93,9 +103,6 @@ Route::get('/vendeur_about',function(){
     return view('vendeur-interface.vendeurApropos');
 });
 
-Route::get('/vendeur_shop',function(){
-    return view('vendeur-interface.vendeurBoutique');
-});
 
 Route::get('/vendeur_contact',function(){
     return view('vendeur-interface.vendeurContact');
