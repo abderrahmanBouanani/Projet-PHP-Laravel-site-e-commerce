@@ -151,7 +151,7 @@
               <tr>
                 <td>
                 @if($produit->image)
-                  <img src="data:image/jpeg;base64,{{ base64_encode($produit->image) }}" alt="{{ $produit->nom }}" style="width: 100px; height: auto;">
+                  <img src="data:image/jpeg;base64,{{ base64_encode($produit->image) }}" alt="{{ $produit->nom }}" style="width: 100px; height: auto;mix-blend-mode: multiply;">
                 @endif
                 </td>
                 <td>{{ $produit->nom }}</td>

@@ -54,7 +54,7 @@ class LoginController extends Controller
                 case 'vendeur':
                     return redirect('/vendeur_home');
                 case 'livreur':
-                    return redirect('/livreur_home');
+                    return redirect('/livreur_livraison');
                 default:
                     return back()->with('error', 'Type d’utilisateur inconnu.');
             }

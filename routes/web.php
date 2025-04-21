@@ -53,7 +53,7 @@ Route::get('/client_contact', function () {
 });
 
 Route::get('/client_profile', function () {
-    return view('client-interface.profilClient');
+    return view('client-interface.profilClient', ['user' => session('user')]);
 });
 
 Route::get('/client_cart', function () {
@@ -71,6 +71,7 @@ Route::get('/client/thankyou', function () {
 Route::get('/client/checkout', function () {
     return view('client-interface.checkout');
 });
+
 
 //Routes pour l'admin
 Route::get('/admin_home', function () {
@@ -108,13 +109,14 @@ Route::get('/vendeur_contact',function(){
     return view('vendeur-interface.vendeurContact');
 });
 
-Route::get('/vendeur_profile',function(){
-    return view('vendeur-interface.vendeurProfile');
+Route::get('/vendeur_profile', function () {
+    return view('vendeur-interface.vendeurProfile', ['user' => session('user')]);
 });
 
 Route::get('/vendeur_service',function(){
     return view('vendeur-interface.vendeurService');
 });
+
 
 //Routes pour le livreur
 
@@ -123,5 +125,9 @@ Route::get('/livreur_livraison',function(){
 });
 
 Route::get('/livreur_profile',function(){
-    return view('delivery interface.profil-livreur');
+    return view('delivery interface.profil-livreur',['user' => session('user')]);
 });
+
+
+
+

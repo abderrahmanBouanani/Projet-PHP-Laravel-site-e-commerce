@@ -46,6 +46,15 @@
           <h2 class="text-center mb-4">Informations de votre compte</h2>
           <div id="userInfo" class="row">
             <!-- Les informations du livreur seront affichées ici -->
+            @if ($user)
+        <p><strong>Nom :</strong> {{ $user['nom'] }}</p>
+        <p><strong>Prénom :</strong> {{ $user['prenom'] }}</p>
+        <p><strong>Email :</strong> {{ $user['email'] }}</p>
+        <p><strong>Téléphone :</strong> {{ $user['telephone'] }}</p>
+        <p><strong>Type d'utilisateur :</strong> {{ $user['type'] }}</p>
+      @else
+        <p>Aucune information disponible. Veuillez vous connecter d'abord.</p>
+      @endif
           </div>
           <div class="text-center mt-4">
             <button id="editProfileBtn" class="btn btn-edit">
@@ -141,27 +150,7 @@
         </div>
       </div>
     </div>
-    <script>
-      // Récupérer les informations de l'utilisateur connecté depuis le localStorage
-      const connectedUser = JSON.parse(localStorage.getItem("connectedUser"));
-
-      if (connectedUser) {
-        // Afficher les informations de l'utilisateur
-        const userInfoContainer = document.getElementById("userInfo");
-        userInfoContainer.innerHTML = `
-            <p><strong>Nom :</strong> ${connectedUser.nom}</p>
-            <p><strong>Prénom :</strong> ${connectedUser.prenom}</p>
-            <p><strong>Email :</strong> ${connectedUser.email}</p>
-            <p><strong>Téléphone :</strong> ${connectedUser.telephone}</p>
-            <p><strong>Type d'utilisateur :</strong> ${connectedUser.type_utilisateur}</p>
-        `;
-      } else {
-        // Si aucun utilisateur connecté n'est trouvé
-        const userInfoContainer = document.getElementById("userInfo");
-        userInfoContainer.innerHTML =
-          "<p>Aucune information disponible. Veuillez vous connecter d'abord.</p>";
-      }
-    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('assets/js/profil-livreur.js')}}"></script>
   </body>
