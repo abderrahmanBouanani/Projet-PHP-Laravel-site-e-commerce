@@ -10,9 +10,12 @@ class Produit extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nom', 'prix_unitaire', 'categorie', 'vendeur_id'
+        'nom',
+        'prix_unitaire',
+        'categorie',
+        'image',// image binaire
+        'vendeur_id'
     ];
-
     public function vendeur()
     {
         return $this->belongsTo(User::class, 'vendeur_id');
