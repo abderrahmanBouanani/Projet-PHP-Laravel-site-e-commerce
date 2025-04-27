@@ -1,9 +1,16 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProduitController; // Ensure this controller exists in the specified namespace
+use App\Models\Cart;
+use App\Models\Produit;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Client\Request as ClientRequest;
+use Illuminate\Http\Request as HttpRequest;
+
 // ---connexion & signu--- 
 
 // Afficher le formulaire de connexion
@@ -29,8 +36,23 @@ Route::post('/signup', [SignupController::class, 'create']);
 //---vendeur---
 // Gérer l'envoi du formulaire d'ajout du produit
 Route::post('/produit', [ProduitController::class, 'store'])->name('vendeur.addProduct');
+Route::delete('/vendeur_shop/{id}', [ProduitController::class, 'destroy'])->name('produits.destroy');
+
+
 
 Route::get('/vendeur_shop', [ProduitController::class, 'index'])->name('vendeur.shop');
+
+
+//chargement des produits
+Route::get('/api/produits', [ProduitController::class, 'getProduits']);
+
+
+
+
+Route::post('/add-to-cart', [CartController::class, 'addToCart']);
+Route::get('/cart', [CartController::class, 'showCart']);
+
+
 
 
 

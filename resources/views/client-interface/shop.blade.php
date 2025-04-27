@@ -69,6 +69,8 @@
       </div>
     </div>
     <!-- End Products Section -->
+
+    
 @endsection <!-- Ici finit le contenu spécifique à cette page -->
 
 

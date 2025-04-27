@@ -13,6 +13,7 @@ class Produit extends Model
         'nom',
         'prix_unitaire',
         'categorie',
+        'quantite',
         'image',// image binaire
         'vendeur_id'
     ];

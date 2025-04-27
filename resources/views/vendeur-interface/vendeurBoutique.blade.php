@@ -37,6 +37,13 @@
             <option value="MontresTactiles">Montres tactiles</option>
           </select>
           <input
+            type="number"
+            id="product-quantite"
+            class="form-control mb-2"
+            placeholder="Quantité du produit"
+            name="quantite"
+          />
+          <input
             type="file"
             id="product-image"
             class="form-control mb-2"
@@ -70,25 +77,33 @@
             <table class="table table-bordered" id="product-table">
               <thead>
               <tr>
+              <th class="product-thumbnail">Id</th>
                 <th class="product-thumbnail">Image</th>
                 <th class="product-name">Produit</th>
                 <th class="product-price">Prix</th>
                 <th class="product-category">Catégorie</th>
+                <th class="product-quantite">Quantité</th>
                 <th class="product-remove">Supprimer</th>
               </tr>
               </thead>
               <tbody>
               @foreach($produits as $produit)
               <tr>
+              <td>{{ $produit->id }}</td>
                 <td>
                 @if($produit->image)
-                  <img src="data:image/jpeg;base64,{{ base64_encode($produit->image) }}" alt="{{ $produit->nom }}" style="width: 100px; height: auto;mix-blend-mode: multiply;">
+                <img src="{{ asset('storage/'.$produit->image) }}" alt="{{ $produit->nom }}" style="width: 100px; height: auto; mix-blend-mode: multiply;">
                 @endif
                 </td>
                 <td>{{ $produit->nom }}</td>
-                <td>{{ number_format($produit->prix_unitaire, 2) }} DH</td>
+                <td>{{ number_format($produit->prix_unitaire) }} DH</td>
                 <td>{{ $produit->categorie }}</td>
-                
+                <td>{{ $produit->quantite }}</td>
+                <form action="{{ route('produits.destroy', $produit->id) }}" method="POST" onsubmit="return confirm('Es-tu sûr de vouloir supprimer ce produit ?');">
+                @csrf
+                @method('DELETE')
+                <td><button class="btn btn-danger btn-sm remove-product">Supprimer</button></td>
+                </form>
               </tr>
               @endforeach
               </tbody>

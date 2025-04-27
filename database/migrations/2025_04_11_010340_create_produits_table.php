@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('nom');
             $table->float('prix_unitaire');
             $table->string('categorie');
-            $table->binary('image')->nullable(); // image binaire
+            $table->integer('quantite');
+            $table->string('image');
             $table->foreignId('vendeur_id')->constrained('users');
             $table->timestamps();
         });

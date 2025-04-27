@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Produit;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Storage;
 class ProduitController extends Controller
 {
     /**
@@ -24,36 +24,56 @@ class ProduitController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
-    {
-        // Vérifier que l'utilisateur est connecté et est un vendeur
-        if (!session('user') || session('user')['type'] !== 'vendeur') {
-            return redirect()->back()->with('error', 'Accès non autorisé.');
-        }
+   
+    //Création
+     public function store(Request $request)
+     {
+         // Vérifier que l'utilisateur est connecté et est un vendeur
+         if (!session('user') || session('user')['type'] !== 'vendeur') {
+             return redirect()->back()->with('error', 'Accès non autorisé.');
+         }
+     
+         // Validation des données du formulaire
+         $request->validate([
+             'nom' => 'required|string|max:255',
+             'prix_unitaire' => 'required|numeric',
+             'categorie' => 'required|string|max:255',
+             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp,bmp|max:2048'
+         ]);
+     
+         // Création d'un nouveau produit
+         $produit = new Produit();
+         $produit->nom = $request->input('nom');
+         $produit->prix_unitaire = $request->input('prix_unitaire');
+         $produit->categorie = $request->input('categorie');
+         $produit->quantite = $request->input('quantite');
+     
+         // Gestion de l'image (si présente)
+         if ($request->hasFile('image')) {
+             // Stocke l'image dans le dossier 'storage/app/public/images' et récupère le chemin
+             $imagePath = $request->file('image')->store('images', 'public');
+             $produit->image = $imagePath;
+         }
+     
+         // Sauvegarde du produit dans la base de données
+         $produit->vendeur_id = session('user')['id'];
+         $produit->save();
+     
+         return redirect()->back()->with('success', 'Produit ajouté avec succès !');
+     }
+     
 
-        // Validate the request data
-        $request->validate([
-            'nom' => 'required|string|max:255',
-            'prix_unitaire' => 'required|numeric',
-            'categorie' => 'required|string|max:255',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp,bmp|max:2048'
-        ]);
+    //Suppression
+    public function destroy($id){
+    $produit = Produit::findOrFail($id);
+    $produit->delete();
 
-        // Create a new product instance
-        $produit = new Produit();
-        $produit->nom = $request->input('nom');  // Changé de 'product_name' à 'nom'
-        $produit->prix_unitaire = $request->input('prix_unitaire');  // Changé de 'product_price' à 'prix_unitaire'
-        $produit->categorie = $request->input('categorie');  // Changé de 'product_category' à 'categorie'
-
-        // Handle the image upload if present
-        if ($request->hasFile('image')) {
-            $produit->image = file_get_contents($request->file('image')->getRealPath());  // Changé de 'product-image' à 'image'
-        }
-
-        // Save the product to the database
-        $produit->vendeur_id = session('user')['id'];
-        $produit->save();
-
-        return redirect()->back()->with('success', 'Produit ajouté avec succès !');
+    return redirect()->back()->with('success', 'Produit supprimé avec succès.');
+}
+    //Récuperation
+    public function getProduits(){
+        $produits = Produit::all();
+        return response()->json($produits);
     }
+ 
 }
