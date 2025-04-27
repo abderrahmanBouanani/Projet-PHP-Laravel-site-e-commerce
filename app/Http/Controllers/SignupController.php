@@ -9,7 +9,7 @@ class SignupController extends Controller
 {
     public function showSignupForm()
     {
-        return view('signup'); 
+        return view('auth.signup'); 
     }
 
     // Gérer la soumission du formulaire d'inscription

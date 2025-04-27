@@ -9,7 +9,7 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        return view('welcome'); // resources/views/login.blade.php
+        return view('auth.welcome'); // resources/views/login.blade.php
     }
 
     public function authenticate(Request $request)

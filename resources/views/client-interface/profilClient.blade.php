@@ -19,39 +19,10 @@
     />
     <link href="{{ asset('assets/css/tiny-slider.css')}}" rel="stylesheet" />
     <link href="{{ asset('assets/css/style.css')}}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ asset('assets/css/profileclient.css')}}" />
     <title>Informations utilisateur</title>
 
-    <style>
-      body {
-        font-family: "Arial", sans-serif;
-        background-color: #f8f9fa;
-      }
-
-      .user-info-card {
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        margin-top: 50px;
-      }
-
-      .user-info-card h2 {
-        text-align: center;
-        color: #333;
-        margin-bottom: 30px;
-      }
-
-      .user-info-card p {
-        font-size: 16px;
-        color: #555;
-        margin-bottom: 10px;
-        line-height: 1.6;
-      }
-
-      .user-info-card p strong {
-        color: #000;
-      }
-    </style>
+    
   </head>
 
   <body>

@@ -15,7 +15,7 @@ class ProduitController extends Controller
     public function index()
     {        
         $produits = Produit::where('vendeur_id', session('user')['id'])->get();
-        return view('vendeur-interface.vendeurBoutique', compact('produits'));
+        return view('vendeur-interface.vendeurBoutique', compact('produits'),['page' => 'ShopAll - Ma Boutique']);
     }
 
     /**

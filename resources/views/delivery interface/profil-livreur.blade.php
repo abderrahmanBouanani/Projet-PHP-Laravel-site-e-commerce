@@ -1,46 +1,7 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopAll - Profil Livreur</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
-    <link rel="stylesheet" href="{{ asset('assets/css/livreur.css')}}" />
-    
-  </head>
-  <body>
-    <div class="sidebar">
-      <nav class="custom-navbar">
-        <a class="navbar-brand" href="{{url('/livreur_livraison')}}">ShopAll<span>.</span></a>
-      </nav>
-      <nav class="side-bar-content">
-        <a href="{{url('/livreur_livraison')}}" class="nav-link d-flex align-items-center">
-          <i class="bi bi-truck me-2"></i>
-          Livraisons
-        </a>
-        <a href="{{url('/livreur_profile')}}" class="nav-link active d-flex align-items-center">
-          <i class="bi bi-person me-2"></i>
-          Profile
-        </a>
-        <a class="nav-link logout-link" href="{{url('/')}}">
-          <img
-            src="../images/logout2.png"
-            alt="Déconnexion"
-            style="height: 30px; width: 30px; margin-left: 15px"
-          />
-          <span class="sr-only">Déconnexion</span>
-        </a>
-      </nav>
-    </div>
+@extends('livreur_base') <!-- Cette ligne indique d'utiliser le layout de base -->
 
-    <div class="main-content">
+@section('content') <!-- Ici commence le contenu spécifique à cette page -->
+<div class="main-content">
       <div class="container">
         <div class="user-info-card">
           <h2 class="text-center mb-4">Informations de votre compte</h2>
@@ -150,9 +111,8 @@
         </div>
       </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('assets/js/profil-livreur.js')}}"></script>
-  </body>
-</html>
+@endsection <!-- Ici finit le contenu spécifique à cette page -->
+
+
+
 

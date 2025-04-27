@@ -1,187 +1,15 @@
-<!DOCTYPE html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ShopAll - Profil</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="shortcut icon" href="{{ asset('images/favicon.png')}}" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
-    />
-    <style>
-      :root {
-        --primary-green: #2f4f4f;
-        --light-green: #3c5f5f;
-        --accent-yellow: #ffd700;
-        --text-white: #ffffff;
-      }
+@extends('admin_base') <!-- Cette ligne indique d'utiliser le layout de base -->
 
-      body {
-        background-color: #fafcfc;
-        margin-left: 280px;
-      }
 
-      .sidebar {
-        background-color: var(--primary-green);
-        height: 100vh;
-        width: 280px;
-        position: fixed;
-        left: 0;
-        top: 0;
-        padding: 20px;
-        border-top-right-radius: 40px;
-        border-bottom-right-radius: 40px;
-      }
+@section('head')
+    @if(Request::is('admin_about'))
+    <link rel="stylesheet" href="{{ asset('assets/css/adminprofile.css')}}" />
+    @endif
+@endsection
 
-      .custom-navbar {
-        margin-bottom: 30px;
-      }
 
-      .navbar-brand {
-        color: var(--text-white);
-        font-size: 28px;
-        font-weight: bold;
-        text-decoration: none;
-      }
-
-      .navbar-brand span {
-        color: var(--accent-yellow);
-      }
-
-      .side-bar-content {
-        display: flex;
-        flex-direction: column;
-      }
-
-      .nav-link {
-        color: var(--text-white);
-        padding: 12px 20px;
-        border-radius: 10px;
-        margin-bottom: 5px;
-        transition: all 0.3s ease;
-      }
-
-      .nav-link:hover {
-        background-color: var(--light-green);
-        color: var(--text-white);
-      }
-
-      .nav-link.active {
-        background-color: var(--light-green);
-        color: var(--text-white);
-        border-left: 3px solid var(--accent-yellow);
-      }
-
-      .main-content {
-        padding: 40px;
-      }
-
-      .user-info-card {
-        background-color: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        margin-bottom: 30px;
-      }
-
-      .user-info-card h2 {
-        color: var(--primary-green);
-        margin-bottom: 20px;
-        font-weight: 600;
-      }
-
-      .user-info-item {
-        margin-bottom: 15px;
-        padding: 10px;
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
-
-      .user-info-item:hover {
-        background-color: #e9ecef;
-      }
-
-      .user-info-label {
-        font-weight: 600;
-        color: var(--primary-green);
-      }
-
-      .user-info-value {
-        color: #495057;
-      }
-
-      .btn-edit {
-        background-color: var(--primary-green);
-        color: var(--text-white);
-        border: none;
-      }
-
-      .btn-edit:hover {
-        background-color: var(--light-green);
-        color: var(--text-white);
-      }
-
-      @media (max-width: 768px) {
-        body {
-          margin-left: 0;
-        }
-
-        .sidebar {
-          width: 100%;
-          height: auto;
-          position: relative;
-          border-radius: 0;
-        }
-
-        .main-content {
-          margin-left: 0;
-          padding: 20px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="sidebar">
-      <nav class="custom-navbar">
-        <a class="navbar-brand" href="{{url('/admin_home')}}">ShopAll<span>.</span></a>
-      </nav>
-
-      <nav class="side-bar-content">
-        <a href="{{url('/admin_home')}}" class="nav-link d-flex align-items-center">
-          <i class="bi bi-grid me-2"></i>
-          Tableau de Bord
-        </a>
-        <a href="{{url('/admin_utilisateur')}}" class="nav-link d-flex align-items-center">
-          <i class="bi bi-person-lines-fill me-2"></i>
-          Utilisateur
-        </a>
-        <a href="{{url('/admin_produit')}}" class="nav-link d-flex align-items-center">
-          <i class="bi bi-box-seam me-2"></i>
-          Produits
-        </a>
-        <a href="{{url('/admin_commande')}}" class="nav-link d-flex align-items-center">
-          <i class="bi bi-cart me-2"></i>
-          Commandes
-        </a>
-        <a href="{{url('/admin_about')}}" class="nav-link active d-flex align-items-center">
-          <i class="bi bi-person me-2"></i>
-          Profile
-        </a>
-        <a class="nav-link" href="{{url('/')}}"
-          ><img
-            src="../images/logout2.png"
-            style="height: 30px; width: 30px; margin-left: 15px"
-        /></a>
-      </nav>
-    </div>
-
-    <div class="main-content">
+@section('content') <!-- Ici commence le contenu spécifique à cette page -->
+<div class="main-content">
       <div class="container">
         <div class="user-info-card">
           <h2 class="text-center mb-4">Informations de votre compte</h2>
@@ -391,5 +219,7 @@
           ).hide();
         });
     </script>
-  </body>
-</html>
+@endsection <!-- Ici finit le contenu spécifique à cette page -->
+
+
+
