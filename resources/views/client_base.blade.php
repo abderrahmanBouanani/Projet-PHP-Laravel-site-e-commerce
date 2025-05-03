@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
@@ -236,6 +235,8 @@
     <script src="{{ asset('assets/js/bootstrap.bundle.min.js')}}"></script>
 	<script src="{{ asset('assets/js/tiny-slider.js')}}"></script>
 	<script src="{{ asset('assets/js/custom.js')}}"></script>
+  <script src="{{ asset('assets/js/cart.js')}}"></script>
+  <script src="{{ asset('assets/js/checkout.js')}}"></script>
     <script src="{{ asset('assets/js/contact.js')}}"></script>
     <script
       type="text/javascript"
@@ -245,111 +246,6 @@
     
 
 
-<script>
-      // Fonction pour charger le résumé de la commande
-      function loadOrderSummary() {
-        const cart = JSON.parse(localStorage.getItem("cart")) || [];
-        const orderSummaryContainer = document.getElementById("order-summary");
-        orderSummaryContainer.innerHTML = "";
 
-        let total = 0;
-        cart.forEach((item) => {
-          const itemTotal = item.price * item.quantity;
-          total += itemTotal;
-          const row = document.createElement("tr");
-          row.innerHTML = `
-          <td>${item.name} <strong class="mx-2">x</strong> ${item.quantity}</td>
-          <td>${itemTotal.toFixed(2)} DH</td>
-        `;
-          orderSummaryContainer.appendChild(row);
-        });
-
-        const totalRow = document.createElement("tr");
-        totalRow.innerHTML = `
-        <td class="text-black font-weight-bold"><strong>Total de la commande</strong></td>
-        <td class="text-black font-weight-bold"><strong>${total.toFixed(
-          2
-        )} DH</strong></td>
-      `;
-        orderSummaryContainer.appendChild(totalRow);
-
-        // Mettre à jour le total dans le localStorage
-        localStorage.setItem("orderTotal", total.toFixed(2));
-      }
-
-      // Fonction pour vérifier le formulaire
-      function validateForm() {
-        const requiredFields = [
-          "c_fname",
-          "c_lname",
-          "c_address",
-          "c_state_country",
-          "c_postal_zip",
-          "c_email_address",
-          "c_phone",
-        ];
-        let isValid = true;
-
-        requiredFields.forEach((field) => {
-          const input = document.getElementById(field);
-          if (!input.value.trim()) {
-            input.classList.add("is-invalid");
-            isValid = false;
-          } else {
-            input.classList.remove("is-invalid");
-          }
-        });
-
-        return isValid;
-      }
-
-      // Fonction pour sauvegarder la commande
-      function saveOrder() {
-        const order = {
-          id: Date.now(), // Utiliser le timestamp comme ID unique
-          date: new Date().toISOString(),
-          customer: {
-            firstName: document.getElementById("c_fname").value,
-            lastName: document.getElementById("c_lname").value,
-            email: document.getElementById("c_email_address").value,
-            phone: document.getElementById("c_phone").value,
-            address: document.getElementById("c_address").value,
-            city: document.getElementById("c_country").value,
-            state: document.getElementById("c_state_country").value,
-            postalCode: document.getElementById("c_postal_zip").value,
-          },
-          items: JSON.parse(localStorage.getItem("cart")) || [],
-          total: parseFloat(localStorage.getItem("orderTotal") || "0"),
-        };
-
-        // Récupérer les commandes existantes ou initialiser un tableau vide
-        const orders = JSON.parse(localStorage.getItem("orders")) || [];
-
-        // Ajouter la nouvelle commande
-        orders.push(order);
-
-        // Sauvegarder les commandes mises à jour
-        localStorage.setItem("orders", JSON.stringify(orders));
-      }
-
-      // Écouteurs d'événements
-      document.addEventListener("DOMContentLoaded", () => {
-        loadOrderSummary();
-
-        document
-          .getElementById("place-order")
-          .addEventListener("click", (e) => {
-            e.preventDefault();
-            if (validateForm()) {
-              saveOrder(); // Sauvegarder la commande
-              localStorage.removeItem("cart");
-              localStorage.removeItem("orderTotal");
-              window.location.href = "{{url('/client/thankyou')}}";
-            } else {
-              alert("Veuillez remplir tous les champs obligatoires.");
-            }
-          });
-      });
-    </script>
   </body>
 </html>

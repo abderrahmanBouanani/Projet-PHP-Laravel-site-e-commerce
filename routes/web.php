@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\CouponController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
@@ -48,9 +49,41 @@ Route::get('/api/produits', [ProduitController::class, 'getProduits']);
 
 
 
+//Ajouter au panier
+Route::post('/api/cart/add', [CartController::class,'addToCart']);
 
-Route::post('/add-to-cart', [CartController::class, 'addToCart']);
-Route::get('/cart', [CartController::class, 'showCart']);
+//Codes promo
+Route::post('/coupon/apply', [CouponController::class, 'applyCoupon']);
+
+// Pour calculer les totaux
+Route::get('/cart/total', [CartController::class, 'getCartTotal']);
+// Pour récupérer les produits du panier
+Route::get('/cart', [CartController::class, 'getCart']);
+
+// Pour supprimer un produit du panier
+Route::delete('/client_cart/remove/{id}', [CartController::class, 'removeCartItem'])->name('remove_from_cart');
+
+// Route pour mettre à jour la quantité d'un produit dans le panier
+Route::post('/cart/update/{id}', [CartController::class, 'updateCartItem']);
+
+
+
+// Routes pour gérer les totaux du panier
+Route::post('/api/cart/update-totals', [App\Http\Controllers\CartController::class, 'updateTotals']);
+Route::get('/api/cart/get-totals', [App\Http\Controllers\CartController::class, 'getTotals']);
+// Route pour créer une commande
+Route::post('/api/orders/create', [App\Http\Controllers\OrderController::class, 'createOrder']);
+
+
+
+
+
+
+
+
+
+
+
 
 
 

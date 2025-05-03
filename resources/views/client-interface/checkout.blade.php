@@ -19,13 +19,7 @@
 
     <div class="untree_co-section">
       <div class="container">
-        <div class="row mb-5">
-          <div class="col-md-12">
-            <div class="border p-4 rounded" role="alert">
-              Déjà client ? <a href="{{url('/')}}">Cliquez ici</a> pour vous connecter
-            </div>
-          </div>
-        </div>
+        
         <div class="row">
           <div class="col-md-6 mb-5 mb-md-0">
             <h2 class="h3 mb-3 text-black">Détails de facturation</h2>
@@ -214,29 +208,7 @@
                     </div>
                   </div>
 
-                  <div class="border p-3 mb-3">
-                    <h3 class="h6 mb-0">
-                      <a
-                        class="d-block"
-                        data-bs-toggle="collapse"
-                        href="#collapsecheque"
-                        role="button"
-                        aria-expanded="false"
-                        aria-controls="collapsecheque"
-                        >Paiement par chèque</a
-                      >
-                    </h3>
-
-                    <div class="collapse" id="collapsecheque">
-                      <div class="py-2">
-                        <p class="mb-0">
-                          Veuillez envoyer votre chèque à Store Name, Store
-                          Street, Store Town, Store State / County, Store
-                          Postcode.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  
 
                   <div class="border p-3 mb-5">
                     <h3 class="h6 mb-0">

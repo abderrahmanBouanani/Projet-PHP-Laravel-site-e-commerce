@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('client_id')->constrained('users')->onDelete('cascade'); // ID du client (associé à la table users)
             $table->foreignId('produit_id')->constrained('produits')->onDelete('cascade'); // ID du produit (associé à la table products)
             $table->string('nom_produit'); // Nom du produit
-            $table->binary('image')->nullable();// Image du produit
+            $table->string('image');
             $table->decimal('prix', 8, 2); // Prix du produit
             $table->integer('quantite')->default(1); // Quantité (initialisée à 1)
             $table->timestamps();

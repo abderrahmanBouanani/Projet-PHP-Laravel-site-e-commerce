@@ -2,58 +2,218 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
-use App\Models\Produit;
 use Illuminate\Http\Request;
+use App\Models\Cart;
+use Auth;
+use Illuminate\Support\Facades\Auth as FacadesAuth;
 
 class CartController extends Controller
 {
     public function addToCart(Request $request)
-    {
-        // Vérifier si l'utilisateur est connecté via la session
-        if (!session()->has('user')) {
-            return response()->json(['error' => 'Non authentifié'], 401);
-        }
+{
+    $request->validate([
+        'produit_id' => 'required|exists:produits,id',
+        'nom_produit' => 'required|string',
+        'image' => 'required|string',
+        'prix' => 'required|numeric'
+    ]);
 
-        // Récupérer l'id de l'utilisateur de la session
-        $userId = session('user.id');
+    // Récupérer l'ID du client connecté
+    $clientId = session('user')['id'];
 
-        // Récupérer les informations du produit via l'ID
-        $productId = $request->input('produit_id');
-        $product = Produit::find($productId);
-
-        // Vérifier si le produit existe
-        if (!$product) {
-            return response()->json(['error' => 'Produit introuvable'], 404);
-        }
-
-        // Récupérer le panier de la session
-        $cart = session()->get('cart', []);
-
-        // Vérifier si le produit est déjà dans le panier
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] += 1; // Incrémenter la quantité
-        } else {
-            // Ajouter le produit au panier
-            $cart[$productId] = [
-                'produit_id' => $product->id,
-                'nom_produit' => $product->nom,
-                'image' => $product->image,
-                'prix' => $product->prix_unitaire,
-                'quantity' => 1 // Initialiser la quantité
-            ];
-        }
-
-        // Mettre à jour le panier dans la session
-        session()->put('cart', $cart);
-
-        return response()->json(['message' => 'Produit ajouté au panier']);
+    if (!$clientId) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Veuillez vous connecter pour ajouter des produits au panier'
+        ], 401);
     }
 
-    // Afficher le panier
-    public function showCart()
-    {
-        $cart = session()->get('cart', []);
-        return response()->json($cart);
+    // Vérifier si le produit existe déjà dans le panier du client
+    $existingCartItem = Cart::where('client_id', $clientId)
+        ->where('produit_id', $request->produit_id)
+        ->first();
+
+    if ($existingCartItem) {
+        // Le produit existe, on augmente la quantité
+        $existingCartItem->increment('quantite', 1);
+    } else {
+        // Le produit n'existe pas, on l'ajoute avec quantite = 1
+        Cart::create([
+            'client_id' => $clientId,
+            'produit_id' => $request->produit_id,
+            'nom_produit' => $request->nom_produit,
+            'image' => $request->image,
+            'prix' => $request->prix,
+            'quantite' => 1
+        ]);
     }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Produit ajouté au panier avec succès'
+    ]);
+}
+
+
+    // Méthode pour récupérer tous les éléments du panier
+    public function getCart()
+    {
+        // Récupérer l'ID du client (utilisateur connecté ou session)
+        $clientId = session('user')['id'];
+        
+        // Récupérer les éléments du panier
+        $cartItems = Cart::where('client_id', $clientId)->get();
+        
+        return response()->json($cartItems);
+    }
+
+    // Méthode pour mettre à jour la quantité d'un élément du panier
+public function updateCartItem(Request $request, $id)
+{
+    try {
+        $cartItem = Cart::findOrFail($id);
+
+        // Vérifier que l'élément appartient bien au client actuel
+        $clientId = session('user')['id'];
+        if ($cartItem->client_id != $clientId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non autorisé'
+            ], 403);
+        }
+
+        // Mettre à jour la quantité
+        $cartItem->quantite = $request->input('quantity');
+        $cartItem->save();
+
+        // Retourner une réponse JSON
+        return response()->json([
+            'success' => true,
+            'message' => 'Quantité mise à jour',
+            'updatedQuantity' => $cartItem->quantite,
+            'total' => $cartItem->prix * $cartItem->quantite
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Erreur lors de la mise à jour du panier: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+    
+    // Méthode pour supprimer un élément du panier
+    public function removeCartItem($id)
+    {
+        try {
+            $cartItem = Cart::findOrFail($id);
+            
+            // Vérifier que l'élément appartient bien au client actuel
+            $clientId = session('user')['id'];
+            if ($cartItem->client_id != $clientId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Non autorisé'
+                ], 403);
+            }
+            
+            // Supprimer l'élément
+            $cartItem->delete();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Élément supprimé du panier avec succès'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression de l\'élément: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Méthode pour calculer le total du panier avec réduction
+public function getCartTotal()
+{
+    // Récupérer l'ID du client
+    $clientId = session('user')['id'];
+    
+    // Récupérer les éléments du panier
+    $cartItems = Cart::where('client_id', $clientId)->get();
+    
+    // Calculer le sous-total
+    $subtotal = $cartItems->sum(function($item) {
+        return $item->prix * ($item->quantity ?? 1);
+    });
+    
+    // Récupérer la réduction du coupon si elle existe
+    $discount = 0;
+    if (session()->has('coupon')) {
+        $coupon = session()->get('coupon');
+        $discount = $coupon['discount_amount'];
+    }
+    
+    // Calculer le total
+    $total = $subtotal - $discount;
+    
+    return response()->json([
+        'subtotal' => $subtotal,
+        'discount' => $discount,
+        'total' => $total,
+        'coupon' => session()->get('coupon')
+    ]);
+}
+
+
+
+
+
+/**
+ * Mettre à jour les totaux du panier dans la session
+ * Cette méthode est appelée depuis le JavaScript pour stocker les totaux
+ */
+public function updateTotals(Request $request)
+{
+    // Valider les données
+    $validated = $request->validate([
+        'subtotal' => 'required|numeric',
+        'discount' => 'required|numeric',
+        'total' => 'required|numeric',
+        'coupon_code' => 'nullable|string'
+    ]);
+
+    // Stocker les totaux dans la session
+    session(['cart_subtotal' => $validated['subtotal']]);
+    session(['cart_discount' => $validated['discount']]);
+    session(['cart_total' => $validated['total']]);
+    
+    if (isset($validated['coupon_code'])) {
+        session(['cart_coupon_code' => $validated['coupon_code']]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Totaux mis à jour avec succès',
+        'data' => [
+            'subtotal' => $validated['subtotal'],
+            'discount' => $validated['discount'],
+            'total' => $validated['total'],
+            'coupon_code' => $validated['coupon_code'] ?? null
+        ]
+    ]);
+}
+
+/**
+ * Récupérer les totaux du panier depuis la session
+ * Cette méthode est appelée depuis le JavaScript pour afficher les totaux sur la page de checkout
+ */
+public function getTotals()
+{
+    return response()->json([
+        'subtotal' => session('cart_subtotal', 0),
+        'discount' => session('cart_discount', 0),
+        'total' => session('cart_total', 0),
+        'coupon_code' => session('cart_coupon_code')
+    ]);
+}
 }

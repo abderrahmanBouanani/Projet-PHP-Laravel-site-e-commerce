@@ -29,7 +29,7 @@
                     <th class="product-price">Prix</th>
                     <th class="product-quantity">Quantité</th>
                     <th class="product-total">Total</th>
-                    <th class="product-remove">Supprimer</th>
+                    
                   </tr>
                 </thead>
                 <tbody id="cart-items">
@@ -44,8 +44,10 @@
           <div class="col-md-6">
             <div class="row mb-5">
               <div class="col-md-6">
-                <button class="btn btn-outline-black btn-sm btn-block">
+                <button  class="btn btn-outline-black btn-sm btn-block">
+                  <a href="{{ url('/client_shop')}}" style="color: white; text-decoration: none;">
                   Continuer les achats
+                  </a>
                 </button>
               </div>
             </div>
