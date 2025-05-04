@@ -29,25 +29,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Fonction pour afficher les produits du panier
 function displayCartItems() {
+  const cartItemsContainer = document.getElementById("cart-items");
+  if (!cartItemsContainer) {
+    console.error("L'élément cart-items n'a pas été trouvé dans le DOM");
+    return;
+  }
+
   fetch("http://127.0.0.1:8000/cart")
     .then((response) => {
       if (!response.ok) {
-        throw new Error("Erreur lors du chargement des produits du panier")
+        return response.json().then(data => {
+          throw new Error(data.message || "Erreur lors du chargement des produits du panier");
+        });
       }
-      return response.json()
+      return response.json();
     })
     .then((data) => {
-      const cartItemsContainer = document.getElementById("cart-items")
-      cartItemsContainer.innerHTML = "" // Vider le tableau avant d'ajouter de nouveaux éléments
-
-      if (data.length === 0) {
-        cartItemsContainer.innerHTML = "<tr><td colspan='6'>Panier vide</td></tr>"
-        return
+      if (!data.success) {
+        throw new Error(data.message || "Erreur lors du chargement des produits du panier");
       }
 
-      data.forEach((item) => {
-        const row = document.createElement("tr")
-        row.setAttribute("data-product-id", item.id)
+      cartItemsContainer.innerHTML = ""; // Vider le tableau avant d'ajouter de nouveaux éléments
+
+      if (data.data.length === 0) {
+        cartItemsContainer.innerHTML = "<tr><td colspan='6'>Panier vide</td></tr>";
+        return;
+      }
+
+      data.data.forEach((item) => {
+        const row = document.createElement("tr");
+        row.setAttribute("data-product-id", item.id);
         row.innerHTML = `
                     <td><img src="http://127.0.0.1:8000/storage/images/${item.image}" alt="${item.nom_produit}" width="100" style="mix-blend-mode: multiply"></td>
                     <td>${item.nom_produit}</td>
@@ -61,17 +72,17 @@ function displayCartItems() {
                     </td>
                     <td id="total-${item.id}" class="product-total" data-price="${item.prix}">${(item.prix * item.quantite).toFixed(2)} DH</td>
                     <td><button type="button" class="remove-btn" onclick="removeFromCart(${item.id})">×</button></td>
-                `
-        cartItemsContainer.appendChild(row)
-      })
+                `;
+        cartItemsContainer.appendChild(row);
+      });
 
       // Mettre à jour les totaux après l'affichage des articles
-      updateCartTotals()
+      updateCartTotals();
     })
     .catch((error) => {
-      console.error("Erreur:", error)
-      showNotification(error.message || "Impossible de charger les articles du panier", "error")
-    })
+      console.error("Erreur:", error);
+      showNotification(error.message || "Impossible de charger les articles du panier", "error");
+    });
 }
 
 // Fonction pour augmenter ou diminuer la quantité

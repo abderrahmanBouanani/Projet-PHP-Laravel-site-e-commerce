@@ -17,9 +17,9 @@
           <div class="col-md-3">
             <select class="form-select" id="statusFilter">
               <option value="all">Tous les statuts</option>
-              <option value="pending">En attente</option>
-              <option value="in_progress">En cours</option>
-              <option value="delivered">Livrée</option>
+              <option value="Confirmée">En attente</option>
+              <option value="En cours de livraison">En cours</option>
+              <option value="Livrée">Livrée</option>
             </select>
           </div>
           <div class="col-md-3">
@@ -35,13 +35,44 @@
           <tr>
             <th>ID Commande</th>
             <th>Adresse</th>
-            <th>Date de livraison</th>
+            <th>Date de commande</th>
             <th>Statut</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody id="deliveriesList">
-          <!-- Les livraisons seront ajoutées ici dynamiquement -->
+        <tbody>
+        @foreach($commandes as $commande)
+          <tr class="{{ $commande->statut === 'Livrée' ? 'table-success' : '' }}">
+            <td>{{ $commande->id }}</td>
+            <td>{{ $commande->adresse }}</td>
+            <td>{{ $commande->created_at ? $commande->created_at->format('d/m/Y') : '' }}</td>
+            <td>
+              @if($commande->statut === 'Confirmée')
+                <span class="badge bg-warning text-dark">En attente</span>
+              @elseif($commande->statut === 'En cours de livraison')
+                <span class="badge bg-primary">En cours</span>
+              @elseif($commande->statut === 'Livrée')
+                <span class="badge bg-success">Livrée</span>
+              @else
+                <span class="badge bg-secondary">{{ $commande->statut }}</span>
+              @endif
+            </td>
+            <td>
+              <button class="btn btn-sm btn-link" onclick="showProducts({{ $commande->id }})">
+                Voir les produits
+              </button>
+              @if($commande->statut === 'Confirmée')
+                <button class="btn btn-sm btn-primary accepter-commande" data-id="{{ $commande->id }}">
+                  Accepter
+                </button>
+              @elseif($commande->statut === 'En cours de livraison')
+                <button class="btn btn-sm btn-success livree-commande" data-id="{{ $commande->id }}">
+                  Livrée
+                </button>
+              @endif
+            </td>
+          </tr>
+        @endforeach
         </tbody>
       </table>
     </div>

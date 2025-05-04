@@ -16,7 +16,31 @@ document.addEventListener("DOMContentLoaded", () => {
         items: order.items
       }))
       
-      displayDeliveries(allDeliveries)
+      // Ne pas effacer les commandes existantes, mais ajouter les nouvelles
+      const existingIds = new Set(Array.from(document.querySelectorAll("tbody tr")).map(tr => tr.querySelector("td:first-child").textContent))
+      
+      allDeliveries.forEach(delivery => {
+        // Ne pas ajouter les commandes qui existent déjà
+        if (existingIds.has(delivery.id.toString())) return
+        
+        // Ne pas afficher les commandes annulées
+        if (delivery.status === "cancelled") return
+        
+        const row = document.createElement("tr")
+        row.innerHTML = `
+          <td>${delivery.id}</td>
+          <td>${delivery.address}</td>
+          <td>${formatDate(delivery.date)}</td>
+          <td>${getStatusBadge(delivery.status)}</td>
+          <td>
+            <button class="btn btn-sm btn-link" onclick="showProducts(${delivery.id})">
+              Voir les produits
+            </button>
+            ${getActionButtons(delivery)}
+          </td>
+        `
+        document.querySelector("tbody").appendChild(row)
+      })
     }
     
     // Convertir le statut de commande en statut de livraison
@@ -90,41 +114,196 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     function filterDeliveries() {
-      const searchTerm = document.getElementById("searchInput").value.toLowerCase()
-      const statusFilter = document.getElementById("statusFilter").value
-  
-      const filteredDeliveries = allDeliveries.filter(
-        (delivery) =>
-          (delivery.id.toString().includes(searchTerm) ||
-            delivery.address.toLowerCase().includes(searchTerm) ||
-            `${delivery.customer.firstName} ${delivery.customer.lastName}`.toLowerCase().includes(searchTerm)) &&
-          (statusFilter === "all" || delivery.status === statusFilter) &&
-          delivery.status !== "cancelled"
-      )
-  
-      displayDeliveries(filteredDeliveries)
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+      const statusFilter = document.getElementById("statusFilter").value;
+      const rows = document.querySelectorAll("tbody tr");
+
+      rows.forEach(row => {
+        const id = row.querySelector("td:first-child").textContent;
+        const address = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
+        const status = row.querySelector("td:nth-child(4) .badge").textContent.trim();
+
+        const matchesSearch = id.includes(searchTerm) || address.includes(searchTerm);
+        const matchesStatus = statusFilter === "all" || 
+          (statusFilter === "Confirmée" && status === "En attente") ||
+          (statusFilter === "En cours de livraison" && status === "En cours") ||
+          (statusFilter === "Livrée" && status === "Livrée");
+
+        row.style.display = matchesSearch && matchesStatus ? "" : "none";
+      });
     }
   
-    window.showProducts = (id) => {
-      const delivery = allDeliveries.find((d) => d.id === id)
-      if (delivery) {
-        const modalProductsList = document.getElementById("modalProductsList")
-        modalProductsList.innerHTML = ""
-        delivery.items.forEach((item) => {
-          const row = document.createElement("tr")
-          row.innerHTML = `
-            <td>${item.name}</td>
-            <td>${item.quantity}</td>
-            <td>${item.price.toFixed(2)} DH</td>
-            <td>${(item.quantity * item.price).toFixed(2)} DH</td>
-          `
-          modalProductsList.appendChild(row)
+    // Fonction pour mettre à jour le statut d'une commande
+    function updateOrderStatus(orderId, newStatus) {
+        fetch(`/livreur/commande/${orderId}/update-status`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
         })
-        
-        const myModal = new bootstrap.Modal(document.getElementById("productsModal"))
-        myModal.show()
-      }
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Recharger la page pour afficher les changements
+                window.location.reload();
+            } else {
+                alert(data.message || 'Erreur lors de la mise à jour du statut.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Une erreur est survenue lors de la mise à jour du statut.');
+        });
     }
+  
+    // Gestion des boutons Accepter
+    document.querySelectorAll('.accepter-commande').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            if (confirm('Êtes-vous sûr de vouloir accepter cette commande ?')) {
+                fetch(`/livreur/commande/${id}/accepter`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mettre à jour le statut dans l'interface
+                        const row = this.closest('tr');
+                        const statusCell = row.querySelector('td:nth-child(4)');
+                        statusCell.innerHTML = '<span class="badge bg-primary">En cours de livraison</span>';
+                        
+                        // Mettre à jour les boutons d'action
+                        const actionCell = row.querySelector('td:nth-child(5)');
+                        actionCell.innerHTML = `
+                            <button class="btn btn-sm btn-link" onclick="showProducts(${id})">
+                                Voir les produits
+                            </button>
+                            <button class="btn btn-sm btn-success livree-commande" data-id="${id}">
+                                Livrée
+                            </button>
+                        `;
+                        
+                        // Réattacher les événements aux nouveaux boutons
+                        attachEventListeners();
+                    } else {
+                        alert(data.message || 'Erreur lors de l\'acceptation de la commande');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue lors de l\'acceptation de la commande');
+                });
+            }
+        });
+    });
+  
+    // Gestion des boutons Livrée
+    document.querySelectorAll('.livree-commande').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const id = this.getAttribute('data-id');
+            if (confirm('Êtes-vous sûr de vouloir marquer cette commande comme livrée ?')) {
+                fetch(`/livreur/commande/${id}/livree`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Mettre à jour le statut dans l'interface
+                        const row = this.closest('tr');
+                        const statusCell = row.querySelector('td:nth-child(4)');
+                        statusCell.innerHTML = '<span class="badge bg-success">Livrée</span>';
+                        
+                        // Mettre à jour les boutons d'action
+                        const actionCell = row.querySelector('td:nth-child(5)');
+                        actionCell.innerHTML = `
+                            <button class="btn btn-sm btn-link" onclick="showProducts(${id})">
+                                Voir les produits
+                            </button>
+                        `;
+                    } else {
+                        alert(data.message || 'Erreur lors de la mise à jour du statut');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Une erreur est survenue lors de la mise à jour du statut');
+                });
+            }
+        });
+    });
+  
+    // Fonction pour réattacher les événements aux boutons
+    function attachEventListeners() {
+        document.querySelectorAll('.accepter-commande').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // ... code existant ...
+            });
+        });
+
+        document.querySelectorAll('.livree-commande').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // ... code existant ...
+            });
+        });
+    }
+  
+    // Fonction pour afficher les produits dans le modal
+    window.showProducts = (orderId) => {
+        fetch(`/livreur/commande/${orderId}/produits`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(products => {
+                const modalProductsList = document.getElementById("modalProductsList");
+                const productsModal = document.getElementById("productsModal");
+                
+                if (!modalProductsList || !productsModal) {
+                    throw new Error('Modal elements not found');
+                }
+                
+                modalProductsList.innerHTML = '';
+                
+                if (!products || products.length === 0) {
+                    modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">Aucun produit dans cette commande</td></tr>`;
+                } else {
+                    products.forEach(item => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${item.nom}</td>
+                            <td>${item.quantite}</td>
+                            <td>${parseFloat(item.prix_unitaire).toFixed(2)} DH</td>
+                            <td>${(item.quantite * item.prix_unitaire).toFixed(2)} DH</td>
+                        `;
+                        modalProductsList.appendChild(row);
+                    });
+                }
+                
+                const myModal = new bootstrap.Modal(productsModal);
+                myModal.show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Une erreur est survenue lors du chargement des produits: ' + error.message);
+            });
+    };
   
     // Sauvegarder les modifications dans localStorage
     function saveDeliveries() {

@@ -322,7 +322,7 @@
                           </div>
                           <h3 class="font-weight-bold">Fatima Zahra Benali</h3>
                           <span class="position d-block mb-3"
-                            >Architecte d'intérieur, Design Élégance</span
+                            >Architecte d'intérieur, Design ��légance</span
                           >
                         </div>
                       </div>
@@ -460,9 +460,3 @@
     </div>
     <!-- End Blog Section -->
 @endsection <!-- Ici finit le contenu spécifique à cette page -->
-
-
-
-
-
-

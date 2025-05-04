@@ -16,24 +16,9 @@ class LoginController extends Controller
     {
         $credentials = $request->only('email', 'motdepasse');
 
-        // Cas spécial pour l'admin
-        if ($credentials['email'] === 'admin@gmail.com' && $credentials['motdepasse'] === 'admin123') {
-            session([
-                'user' => [
-                    'id' => 0, // Admin ID
-                    'nom' => 'Admin',
-                    'prenom' => 'Super',
-                    'email' => $credentials['email'],
-                    'telephone' => 'N/A',
-                    'type' => 'admin'
-                ]
-            ]);
-            return redirect('/admin_home');
-        }
-
-        // Vérifier dans la base de données
+        // Vérifier d'abord dans la base de données
         $user = User::where('email', $credentials['email'])
-                    ->where('password', $credentials['motdepasse']) // à remplacer par Hash::check() si mot de passe hashé
+                    ->where('password', $credentials['motdepasse'])
                     ->first();
 
         if ($user) {
@@ -55,12 +40,29 @@ class LoginController extends Controller
                     return redirect('/vendeur_home');
                 case 'livreur':
                     return redirect('/livreur_livraison');
+                case 'admin':
+                    return redirect('/admin_home');
                 default:
-                    return back()->with('error', 'Type d’utilisateur inconnu.');
+                    return back()->with('error', "Type d'utilisateur inconnu.");
             }
-        } else {
-            return back()->with('error', 'Email ou mot de passe incorrect.');
-        }      
+        }
+
+        // Si aucun utilisateur n'est trouvé dans la base de données, vérifier les identifiants de l'admin
+        if ($credentials['email'] === 'admin@gmail.com' && $credentials['motdepasse'] === 'admin123') {
+            session([
+                'user' => [
+                    'id' => 0,
+                    'nom' => 'Admin',
+                    'prenom' => 'Super',
+                    'email' => $credentials['email'],
+                    'telephone' => 'N/A',
+                    'type' => 'admin'
+                ]
+            ]);
+            return redirect('/admin_home');
+        }
+
+        return back()->with('error', 'Email ou mot de passe incorrect.');
     }
     
 }

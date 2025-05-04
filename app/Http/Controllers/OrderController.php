@@ -7,6 +7,8 @@ use App\Models\Commande;
 use App\Models\Facturation;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -56,7 +58,7 @@ class OrderController extends Controller
             $commande = Commande::create([
                 'client_id' => $clientId,
                 'adresse' => $request->input('customer.address'),
-                // Si vous avez ajouté ces champs à votre modèle Commande
+                'statut' => 'En attente',
                 'methode_paiement' => $request->input('payment_method'),
                 'total' => $total,
                 'reduction' => $discount
@@ -77,8 +79,24 @@ class OrderController extends Controller
             ]);
 
             // Récupérer les articles du panier pour les associer à la commande
-            // (Cette partie dépend de votre structure de base de données)
-            // Vous pourriez avoir une table commande_produits ou similaire
+            $cartItems = Cart::where('client_id', $clientId)->get();
+            
+            Log::info('Creating order with ' . count($cartItems) . ' items for client ' . $clientId);
+            
+            foreach ($cartItems as $item) {
+                // Ajouter chaque produit à la commande
+                try {
+                    DB::table('commande_produit')->insert([
+                        'commande_id' => $commande->id,
+                        'produit_id' => $item->produit_id,
+                        'quantite' => $item->quantite ?? 1
+                    ]);
+                    
+                    Log::info('Added product ' . $item->produit_id . ' to order ' . $commande->id);
+                } catch (\Exception $e) {
+                    Log::error('Error adding product to order: ' . $e->getMessage());
+                }
+            }
             
             // Vider le panier après la commande
             Cart::where('client_id', $clientId)->delete();
@@ -95,6 +113,7 @@ class OrderController extends Controller
                 'order_id' => $commande->id
             ]);
         } catch (\Exception $e) {
+            Log::error('Order creation error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création de la commande: ' . $e->getMessage()

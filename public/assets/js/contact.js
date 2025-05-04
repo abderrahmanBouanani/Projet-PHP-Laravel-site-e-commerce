@@ -1,11 +1,27 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("#contact-form").parentElement; // Récupérer le formulaire
+    const form = document.querySelector("#contact-form");
+    if (!form) {
+        console.error("Le formulaire contact-form n'a pas été trouvé dans le DOM");
+        return;
+    }
+
+    const formParent = form.parentElement;
+    if (!formParent) {
+        console.error("Le parent du formulaire n'a pas été trouvé dans le DOM");
+        return;
+    }
+
     const fnameInput = document.querySelector("#fname");
     const lnameInput = document.querySelector("#lname");
     const emailInput = document.querySelector("#email");
     const messageInput = document.querySelector("#message");
 
-    form.addEventListener("submit", function (e) {
+    if (!fnameInput || !lnameInput || !emailInput || !messageInput) {
+        console.error("Un ou plusieurs champs du formulaire n'ont pas été trouvés dans le DOM");
+        return;
+    }
+
+    formParent.addEventListener("submit", function (e) {
         e.preventDefault(); // Empêcher l'envoi par défaut du formulaire
 
         // Vérification des champs

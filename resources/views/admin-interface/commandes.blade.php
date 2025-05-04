@@ -43,7 +43,58 @@
           </tr>
         </thead>
         <tbody id="ordersList">
-          <!-- Les commandes seront ajoutées ici dynamiquement -->
+          @if(count($commandes) > 0)
+            @foreach($commandes as $commande)
+            <tr>
+              <td>{{ $commande->id }}</td>
+              <td>
+                @if($commande->client)
+                  {{ $commande->client->nom }} {{ $commande->client->prenom }}
+                @else
+                  Client inconnu
+                @endif
+              </td>
+              <td>
+                <button class="btn btn-sm btn-link show-products" data-commande-id="{{ $commande->id }}">
+                  Voir les produits
+                </button>
+              </td>
+              <td>{{ \Carbon\Carbon::parse($commande->created_at)->format('d/m/Y') }}</td>
+              <td>{{ number_format($commande->total ?? 0, 2) }} DH</td>
+              <td>
+                @if($commande->statut === 'Confirmée')
+                  <span class="badge bg-warning text-dark">Confirmée</span>
+                @elseif($commande->statut === 'En cours de livraison')
+                  <span class="badge bg-primary">En cours de livraison</span>
+                @elseif($commande->statut === 'Livrée')
+                  <span class="badge bg-success">Livrée</span>
+                @elseif($commande->statut === 'Annulée')
+                  <span class="badge bg-danger">Annulée</span>
+                @else
+                  <span class="badge bg-secondary">En attente</span>
+                @endif
+              </td>
+              <td>
+                @if($commande->statut === 'En attente')
+                  <form action="{{ url('/admin/commande/' . $commande->id . '/status') }}" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="statut" value="Confirmée">
+                    <button type="submit" class="btn btn-sm btn-success me-2">Confirmer</button>
+                  </form>
+                  <form action="{{ url('/admin/commande/' . $commande->id . '/status') }}" method="POST" class="d-inline">
+                    @csrf
+                    <input type="hidden" name="statut" value="Annulée">
+                    <button type="submit" class="btn btn-sm btn-danger">Annuler</button>
+                  </form>
+                @endif
+              </td>
+            </tr>
+            @endforeach
+          @else
+            <tr>
+              <td colspan="7" class="text-center">Aucune commande trouvée</td>
+            </tr>
+          @endif
         </tbody>
       </table>
     </div>
@@ -83,183 +134,179 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      let allOrders = [];
-
       document.addEventListener("DOMContentLoaded", () => {
-        loadOrders();
-        document
-          .getElementById("searchButton")
-          .addEventListener("click", filterOrders);
-        document
-          .getElementById("sortSelect")
-          .addEventListener("change", sortOrders);
+        document.getElementById("searchButton").addEventListener("click", filterOrders);
+        document.getElementById("sortSelect").addEventListener("change", filterOrders);
+        
+        // Ajouter des écouteurs d'événements pour les boutons "Voir les produits"
+        document.querySelectorAll('.show-products').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-commande-id');
+            showProducts(commandeId);
+          });
+        });
       });
 
-      function loadOrders() {
-        allOrders = JSON.parse(localStorage.getItem("orders")) || [];
-
-        allOrders = allOrders.map((order) => ({
-          ...order,
-          status: order.status || "En attente",
-        }));
-        displayOrders(allOrders);
+      function filterOrders() {
+        const searchTerm = document.getElementById("searchInput").value;
+        const sortValue = document.getElementById("sortSelect").value;
+        
+        // Appel à l'API de recherche
+        fetch(`/api/admin/commande/search?search=${searchTerm}&sort=${sortValue}`)
+          .then(response => response.json())
+          .then(data => {
+            displayOrders(data);
+          })
+          .catch(error => {
+            console.error('Error searching orders:', error);
+          });
       }
 
       function displayOrders(orders) {
         const ordersList = document.getElementById("ordersList");
         ordersList.innerHTML = "";
-
-        orders.forEach((order) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-                    <td>${order.id}</td>
-                    <td>${order.customer.firstName} ${
-            order.customer.lastName
-          }</td>
-                    <td>
-                        <button class="btn btn-sm btn-link" onclick="showProducts(${
-                          order.id
-                        })">
-                            Voir les produits
-                        </button>
-                    </td>
-                    <td>${formatDate(order.date)}</td>
-                    <td>${order.total.toFixed(2)} DH</td>
-                    <td>${getStatusBadge(order.status)}</td>
-                    <td>${getActionButtons(order)}</td>
-                `;
-          ordersList.appendChild(row);
+        
+        if (orders.length === 0) {
+          ordersList.innerHTML = `<tr><td colspan="7" class="text-center">Aucune commande trouvée</td></tr>`;
+          return;
+        }
+        
+        orders.forEach(order => {
+          const clientName = order.client 
+            ? `${order.client.nom} ${order.client.prenom}` 
+            : 'Client inconnu';
+            
+          const formattedDate = new Date(order.created_at).toLocaleDateString('fr-FR');
+          
+          let statusBadge = '';
+          if (order.statut === 'Confirmée') {
+            statusBadge = '<span class="badge bg-warning text-dark">Confirmée</span>';
+          } else if (order.statut === 'En cours de livraison') {
+            statusBadge = '<span class="badge bg-primary">En cours de livraison</span>';
+          } else if (order.statut === 'Livrée') {
+            statusBadge = '<span class="badge bg-success">Livrée</span>';
+          } else if (order.statut === 'Annulée') {
+            statusBadge = '<span class="badge bg-danger">Annulée</span>';
+          } else {
+            statusBadge = '<span class="badge bg-secondary">En attente</span>';
+          }
+          
+          let actionButtons = '';
+          if (order.statut === 'En attente') {
+            actionButtons = `
+              <form action="/admin/commande/${order.id}/status" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="statut" value="Confirmée">
+                <button type="submit" class="btn btn-sm btn-success me-2">Confirmer</button>
+              </form>
+              <form action="/admin/commande/${order.id}/status" method="POST" class="d-inline">
+                @csrf
+                <input type="hidden" name="statut" value="Annulée">
+                <button type="submit" class="btn btn-sm btn-danger">Annuler</button>
+              </form>
+            `;
+          }
+          
+          const row = `
+            <tr>
+              <td>${order.id}</td>
+              <td>${clientName}</td>
+              <td>
+                <button class="btn btn-sm btn-link show-products" data-commande-id="${order.id}">
+                  Voir les produits
+                </button>
+              </td>
+              <td>${formattedDate}</td>
+              <td>${parseFloat(order.total || 0).toFixed(2)} DH</td>
+              <td>${statusBadge}</td>
+              <td>${actionButtons}</td>
+            </tr>
+          `;
+          ordersList.insertAdjacentHTML("beforeend", row);
+        });
+        
+        // Réattacher les écouteurs d'événements aux nouveaux boutons
+        document.querySelectorAll('.show-products').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-commande-id');
+            showProducts(commandeId);
+          });
         });
       }
 
-      function formatDate(dateString) {
-        const date = new Date(dateString);
-        return `${date.getDate().toString().padStart(2, "0")}/${(
-          date.getMonth() + 1
-        )
-          .toString()
-          .padStart(2, "0")}/${date.getFullYear()}`;
+function showProducts(commandeId) {
+  // Add CSRF token to the request headers
+  const headers = {
+    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+
+  // Show loading indicator in the modal
+  const modalProductsList = document.getElementById("modalProductsList");
+  modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p>Chargement des produits...</p>
+  </td></tr>`;
+  
+  // Show the modal immediately with loading indicator
+  const modal = new bootstrap.Modal(document.getElementById("productsModal"));
+  modal.show();
+
+  fetch(`/admin/api/products/${commandeId}`, {
+    method: 'GET',
+    headers: headers,
+    credentials: 'same-origin'
+  })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(err => {
+          throw new Error(err.error || 'Erreur serveur');
+        });
       }
-
-      function getStatusBadge(status) {
-        switch (status) {
-          case "Confirmée":
-            return '<span class="badge bg-success">Confirmée</span>';
-          case "Annulée":
-            return '<span class="badge bg-danger">Annulée</span>';
-          default:
-            return '<span class="badge bg-warning text-dark">En attente</span>';
-        }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Products data:', data); // Debug log
+      
+      modalProductsList.innerHTML = "";
+      
+      if (!data || data.length === 0) {
+        modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">Aucun produit dans cette commande</td></tr>`;
+      } else {
+        // Ensure we're working with an array
+        const products = Array.isArray(data) ? data : [data];
+        products.forEach(item => {
+          const prix = parseFloat(item.prix_unitaire || 0);
+          const quantite = parseInt(item.quantite || 0);
+          const total = prix * quantite;
+          
+          const row = `
+            <tr>
+              <td>${item.nom || 'Produit inconnu'}</td>
+              <td>${quantite}</td>
+              <td>${prix.toFixed(2)} DH</td>
+              <td>${total.toFixed(2)} DH</td>
+            </tr>
+          `;
+          modalProductsList.insertAdjacentHTML("beforeend", row);
+        });
       }
-
-      function getActionButtons(order) {
-        if (order.status === "En attente") {
-          return `
-                    <button class="btn btn-sm btn-success me-2" onclick="confirmOrder(${order.id})">Confirmer</button>
-                    <button class="btn btn-sm btn-danger" onclick="cancelOrder(${order.id})">Annuler</button>
-                `;
-        }
-        return "";
-      }
-
-      function showProducts(orderId) {
-        const order = allOrders.find((o) => o.id === orderId);
-
-        if (order) {
-          const modalProductsList =
-            document.getElementById("modalProductsList");
-          modalProductsList.innerHTML = "";
-
-          order.items.forEach((item) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>${item.price.toFixed(2)} DH</td>
-                        <td>${(item.price * item.quantity).toFixed(2)} DH</td>
-                    `;
-            modalProductsList.appendChild(row);
-          });
-
-          const modal = new bootstrap.Modal(
-            document.getElementById("productsModal")
-          );
-          modal.show();
-        }
-      }
-
-      function filterOrders() {
-        const searchTerm = document
-          .getElementById("searchInput")
-          .value.toLowerCase();
-        const filteredOrders = allOrders.filter(
-          (order) =>
-            order.id.toString().includes(searchTerm) ||
-            `${order.customer.firstName} ${order.customer.lastName}`
-              .toLowerCase()
-              .includes(searchTerm) ||
-            formatDate(order.date).includes(searchTerm)
-        );
-        displayOrders(filteredOrders);
-      }
-
-      function sortOrders() {
-        const sortValue = document.getElementById("sortSelect").value;
-        let sortedOrders = [...allOrders];
-
-        switch (sortValue) {
-          case "date-desc":
-            sortedOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-            break;
-          case "date-asc":
-            sortedOrders.sort((a, b) => new Date(a.date) - new Date(b.date));
-            break;
-          case "total-desc":
-            sortedOrders.sort((a, b) => b.total - a.total);
-            break;
-          case "total-asc":
-            sortedOrders.sort((a, b) => a.total - b.total);
-            break;
-        }
-
-        displayOrders(sortedOrders);
-      }
-
-      function saveOrders() {
-        localStorage.setItem("orders", JSON.stringify(allOrders));
-      }
-
-      function addOrder(newOrder) {
-        allOrders.push(newOrder);
-        saveOrders();
-        displayOrders(allOrders);
-      }
-
-      function deleteOrder(orderId) {
-        allOrders = allOrders.filter((order) => order.id !== orderId);
-        saveOrders();
-        displayOrders(allOrders);
-      }
-
-      function confirmOrder(orderId) {
-        const order = allOrders.find((o) => o.id === orderId);
-        if (order) {
-          order.status = "Confirmée";
-          saveOrders();
-          displayOrders(allOrders);
-        }
-      }
-
-      function cancelOrder(orderId) {
-        const order = allOrders.find((o) => o.id === orderId);
-        if (order) {
-          order.status = "Annulée";
-          saveOrders();
-          displayOrders(allOrders);
-        }
-      }
+    })
+    .catch(error => {
+      console.error('Error loading products:', error);
+      modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center text-danger">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        Erreur lors du chargement des produits: ${error.message}
+        <p class="mt-2">
+          <button class="btn btn-sm btn-outline-secondary" onclick="showProducts(${commandeId})">
+            <i class="bi bi-arrow-clockwise me-1"></i> Réessayer
+          </button>
+        </p>
+      </td></tr>`;
+    });
+}
     </script>
 @endsection <!-- Ici finit le contenu spécifique à cette page -->
-
-
-

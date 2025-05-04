@@ -9,7 +9,7 @@
           <div class="stats-card">
             <h6 class="text-muted mb-3">Total Clients</h6>
             <div class="d-flex justify-content-between align-items-center">
-              <h3 id="totalClients">0</h3>
+              <h3 id="totalClients">{{ $stats['clients'] }}</h3>
               <i class="bi bi-people fs-3 stats-icon"></i>
             </div>
             <div class="mt-3">
@@ -23,7 +23,7 @@
           <div class="stats-card">
             <h6 class="text-muted mb-3">Total Vendeurs</h6>
             <div class="d-flex justify-content-between align-items-center">
-              <h3 id="totalVendors">0</h3>
+              <h3 id="totalVendors">{{ $stats['vendeurs'] }}</h3>
               <i class="bi bi-person-workspace fs-3 stats-icon"></i>
             </div>
             <div class="mt-3">
@@ -37,7 +37,7 @@
           <div class="stats-card">
             <h6 class="text-muted mb-3">Total Produits</h6>
             <div class="d-flex justify-content-between align-items-center">
-              <h3 id="totalProducts">0</h3>
+              <h3 id="totalProducts">{{ $stats['produits'] }}</h3>
               <i class="bi bi-box-seam fs-3 stats-icon"></i>
             </div>
             <div class="mt-3">
@@ -51,7 +51,7 @@
           <div class="stats-card">
             <h6 class="text-muted mb-3">Total Commandes</h6>
             <div class="d-flex justify-content-between align-items-center">
-              <h3 id="totalOrders">0</h3>
+              <h3 id="totalOrders">{{ $stats['commandes'] }}</h3>
               <i class="bi bi-cart fs-3 stats-icon"></i>
             </div>
             <div class="mt-3">
@@ -146,180 +146,114 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
-        loadDashboardData();
         initializeCharts();
+        loadRecentOrders();
       });
 
-      function loadDashboardData() {
-        loadTotalProducts();
-        loadUserData();
-        loadOrdersData();
+      function initializeCharts() {
+        // Obtenir les données depuis l'API
+        fetch('/api/admin/dashboard/chart-data')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(response => {
+            if (response.success && response.data) {
+              renderOrdersChart(response.data.orders);
+              renderRevenueChart(response.data.monthly_sales);
+              renderCategoriesChart(response.data.top_products);
+              renderUserStatsChart([
+                { name: 'Clients', data: [{{ $stats['clients'] }}] },
+                { name: 'Vendeurs', data: [{{ $stats['vendeurs'] }}] }
+              ]);
+            } else {
+              throw new Error('Invalid data format');
+            }
+          })
+          .catch(error => {
+            console.error('Error loading chart data:', error);
+            // En cas d'erreur, initialiser les graphiques avec des données de test
+            initializeChartsWithTestData();
+          });
       }
 
-      function initializeCharts() {
-        // Get data from localStorage
-        const orders = JSON.parse(localStorage.getItem("orders")) || [];
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        const existingProducts = [
-          {
-            name: "MSI",
-            price: 11500.0,
-            image: "images/pc1.jpg",
-            category: "Ordinateurs",
-          },
-          {
-            name: "Ecran Dell",
-            price: 1500.0,
-            image: "images/ecran12.jpg",
-            category: "Écrans",
-          },
-          {
-            name: "Ecran Dell mini",
-            price: 2000.0,
-            image: "images/pc2.jpg",
-            category: "Écrans",
-          },
-          {
-            name: "Ecran Gamer 60HZ",
-            price: 3500.0,
-            image: "images/pc4.jpg",
-            category: "Écrans",
-          },
-          {
-            name: "Asus i3",
-            price: 3500.0,
-            image: "images/unite1.jpg",
-            category: "Ordinateurs",
-          },
-          {
-            name: "Dell I5",
-            price: 3000.0,
-            image: "images/unite4.webp",
-            category: "Ordinateurs",
-          },
-          {
-            name: "HP I7",
-            price: 5000.0,
-            image: "images/uniten1.webp",
-            category: "Ordinateurs",
-          },
-          {
-            name: "HP I5",
-            price: 3000.0,
-            image: "images/uniten2.jpeg",
-            category: "Ordinateurs",
-          },
-          {
-            name: "World Time",
-            price: 5000.0,
-            image: "images/montre1.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Rolex",
-            price: 7000.0,
-            image: "images/montre2.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Boss Collection",
-            price: 8500.0,
-            image: "images/montre6.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Boss Collection Black",
-            price: 8000.0,
-            image: "images/montre7.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Chaise Gamer",
-            price: 2500.0,
-            image: "images/chaise1.jpg",
-            category: "Chaises",
-          },
-          {
-            name: "Chaise Gamer",
-            price: 3000.0,
-            image: "images/chaise2.jpg",
-            category: "Chaises",
-          },
-          {
-            name: "Chaise normal",
-            price: 700.0,
-            image: "images/product-2.png",
-            category: "Chaises",
-          },
-          {
-            name: "Chaise Zen",
-            price: 400.0,
-            image: "images/product-1.png",
-            category: "Chaises",
-          },
-          {
-            name: "Clavier Mécanique",
-            price: 1500.0,
-            image:
-              "https://jmb.com.tn/wp-content/uploads/2024/06/clavier-gamer-spirit-of-gamer-xpert-k200-rgb-noir-600x600.jpg",
-            category: "Claviers",
-          },
-          {
-            name: "Clavier Mécanique (puissant)",
-            price: 1700.0,
-            image: "images/clavier2.jpg",
-            category: "Claviers",
-          },
-          {
-            name: "Clavier Normal",
-            price: 200.0,
-            image:
-              "https://rightech.ma/2774-medium_default/clavier-dell-multimedia-keyboard-kb216-azerty-noir.webp",
-            category: "Claviers",
-          },
-          {
-            name: "Clavier Normal Standard",
-            price: 250.0,
-            image: "images/clavier4.jpg",
-            category: "Claviers",
-          },
-        ];
-        const localStorageProducts =
-          JSON.parse(localStorage.getItem("products")) || [];
-        const allProducts = [...existingProducts, ...localStorageProducts];
-
-        // Process data for daily orders chart
-        const last7Days = [...Array(7)]
-          .map((_, i) => {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            return d.toISOString().split("T")[0];
+      function loadRecentOrders() {
+        fetch('/api/admin/dashboard/recent-orders')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
           })
-          .reverse();
+          .then(orders => {
+            const recentOrdersContainer = document.getElementById("recentOrders");
+            
+            if (!Array.isArray(orders) || orders.length === 0) {
+              recentOrdersContainer.innerHTML = `
+                <tr>
+                  <td colspan="4" class="text-center">Aucune commande disponible</td>
+                </tr>
+              `;
+            } else {
+              recentOrdersContainer.innerHTML = orders
+                .map(order => `
+                  <tr>
+                    <td>${formatDate(new Date(order.created_at))}</td>
+                    <td>${order.client ? order.client.nom + ' ' + order.client.prenom : 'Client inconnu'}</td>
+                    <td>${order.produits ? order.produits.map(p => p.nom).join(', ') : ''}</td>
+                    <td>${order.total ? order.total.toFixed(2) : '0.00'} DH</td>
+                  </tr>
+                `)
+                .join("");
+            }
+          })
+          .catch(error => {
+            console.error('Error loading recent orders:', error);
+            // En cas d'erreur, afficher un message et utiliser des données de test
+            const recentOrdersContainer = document.getElementById("recentOrders");
+            recentOrdersContainer.innerHTML = `
+              <tr>
+                <td>Aujourd'hui</td>
+                <td>Client Test</td>
+                <td>Produit Test</td>
+                <td>0.00 DH</td>
+              </tr>
+            `;
+          });
+      }
 
-        const dailyOrders = last7Days.map((date) => {
-          return orders.filter((order) => order.date.startsWith(date)).length;
-        });
+      // Initialisation des graphiques avec des données de test (si l'API échoue)
+      function initializeChartsWithTestData() {
+        // Données de test pour les graphiques
+        const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+        const dailyOrders = [5, 7, 3, 8, 10, 6, 4];
+        const dailyRevenue = [2500, 3200, 1800, 4100, 5000, 2900, 2000];
+        const categoryCount = {
+          'Ordinateurs': 8,
+          'Écrans': 6,
+          'Montres': 4,
+          'Chaises': 5,
+          'Claviers': 3
+        };
+        const userStats = [
+          { name: 'Clients', data: [{{ $stats['clients'] }}] },
+          { name: 'Vendeurs', data: [{{ $stats['vendeurs'] }}] }
+        ];
 
-        // Process data for revenue chart
-        const dailyRevenue = last7Days.map((date) => {
-          return orders
-            .filter((order) => order.date.startsWith(date))
-            .reduce((sum, order) => sum + order.total, 0);
-        });
+        renderOrdersChart({ labels: days, data: dailyOrders });
+        renderRevenueChart({ labels: days, data: dailyRevenue });
+        renderCategoriesChart(categoryCount);
+        renderUserStatsChart(userStats);
+      }
 
-        // Process data for categories distribution
-        const categoryCount = allProducts.reduce((acc, product) => {
-          acc[product.category] = (acc[product.category] || 0) + 1;
-          return acc;
-        }, {});
-
-        // Daily Orders Bar Chart
+      function renderOrdersChart(orderData) {
         const ordersChartOptions = {
           series: [
             {
               name: "Commandes",
-              data: dailyOrders,
+              data: orderData.data,
             },
           ],
           chart: {
@@ -330,26 +264,27 @@
           colors: [
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-1"
-            ),
+            ) || "#3b5d50",
           ],
           plotOptions: {
-            bar: { borderRadius: 4 },
+            bar: { borderRadius: 4 }
           },
           xaxis: {
-            categories: ["Mar", "Mer", "Jeu", "Ven", "Sam", "Dim", "Lun"],
+            categories: orderData.labels,
           },
         };
         new ApexCharts(
           document.querySelector("#ordersChart"),
           ordersChartOptions
         ).render();
+      }
 
-        // Revenue Line Chart
+      function renderRevenueChart(revenueData) {
         const revenueChartOptions = {
           series: [
             {
               name: "Revenus",
-              data: dailyRevenue,
+              data: revenueData.data,
             },
           ],
           chart: {
@@ -360,19 +295,11 @@
           colors: [
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-2"
-            ),
+            ) || "#f9bf29",
           ],
           stroke: { curve: "smooth" },
           xaxis: {
-            categories: [
-              "Lundi",
-              "Mardi",
-              "Mercredi",
-              "Jeudi",
-              "Vendredi",
-              "Samedi",
-              "Dimanche",
-            ],
+            categories: revenueData.labels,
           },
           yaxis: {
             labels: {
@@ -384,54 +311,43 @@
           document.querySelector("#revenueChart"),
           revenueChartOptions
         ).render();
+      }
 
-        // Categories Distribution Chart
+      function renderCategoriesChart(categoryData) {
         const categoriesChartOptions = {
-          series: Object.values(categoryCount),
+          series: categoryData.data,
           chart: {
             type: "pie",
             height: 300,
           },
-          labels: Object.keys(categoryCount),
+          labels: categoryData.labels,
           colors: [
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-1"
-            ),
+            ) || "#3b5d50",
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-2"
-            ),
+            ) || "#f9bf29",
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-3"
-            ),
+            ) || "#6c757d",
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-4"
-            ),
+            ) || "#20c997",
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-5"
-            ),
+            ) || "#fd7e14",
           ],
         };
         new ApexCharts(
           document.querySelector("#categoriesChart"),
           categoriesChartOptions
         ).render();
+      }
 
-        // User Statistics Chart
+      function renderUserStatsChart(userStats) {
         const userStatsChartOptions = {
-          series: [
-            {
-              name: "Clients",
-              data: [
-                users.filter((u) => u.type_utilisateur === "client").length,
-              ],
-            },
-            {
-              name: "Vendeurs",
-              data: [
-                users.filter((u) => u.type_utilisateur === "Vendeur").length,
-              ],
-            },
-          ],
+          series: userStats,
           chart: {
             type: "bar",
             height: 300,
@@ -440,10 +356,10 @@
           colors: [
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-1"
-            ),
+            ) || "#3b5d50",
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-2"
-            ),
+            ) || "#f9bf29",
           ],
           plotOptions: {
             bar: {
@@ -463,185 +379,7 @@
         ).render();
       }
 
-      function loadTotalProducts() {
-        const existingProducts = [
-          {
-            name: "MSI",
-            price: 11500.0,
-            image: "images/pc1.jpg",
-            category: "Ordinateurs",
-          },
-          {
-            name: "Ecran Dell",
-            price: 1500.0,
-            image: "images/ecran12.jpg",
-            category: "Écrans",
-          },
-          {
-            name: "Ecran Dell mini",
-            price: 2000.0,
-            image: "images/pc2.jpg",
-            category: "Écrans",
-          },
-          {
-            name: "Ecran Gamer 60HZ",
-            price: 3500.0,
-            image: "images/pc4.jpg",
-            category: "Écrans",
-          },
-          {
-            name: "Asus i3",
-            price: 3500.0,
-            image: "images/unite1.jpg",
-            category: "Ordinateurs",
-          },
-          {
-            name: "Dell I5",
-            price: 3000.0,
-            image: "images/unite4.webp",
-            category: "Ordinateurs",
-          },
-          {
-            name: "HP I7",
-            price: 5000.0,
-            image: "images/uniten1.webp",
-            category: "Ordinateurs",
-          },
-          {
-            name: "HP I5",
-            price: 3000.0,
-            image: "images/uniten2.jpeg",
-            category: "Ordinateurs",
-          },
-          {
-            name: "World Time",
-            price: 5000.0,
-            image: "images/montre1.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Rolex",
-            price: 7000.0,
-            image: "images/montre2.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Boss Collection",
-            price: 8500.0,
-            image: "images/montre6.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Boss Collection Black",
-            price: 8000.0,
-            image: "images/montre7.jpg",
-            category: "Montres",
-          },
-          {
-            name: "Chaise Gamer",
-            price: 2500.0,
-            image: "images/chaise1.jpg",
-            category: "Chaises",
-          },
-          {
-            name: "Chaise Gamer",
-            price: 3000.0,
-            image: "images/chaise2.jpg",
-            category: "Chaises",
-          },
-          {
-            name: "Chaise normal",
-            price: 700.0,
-            image: "images/product-2.png",
-            category: "Chaises",
-          },
-          {
-            name: "Chaise Zen",
-            price: 400.0,
-            image: "images/product-1.png",
-            category: "Chaises",
-          },
-          {
-            name: "Clavier Mécanique",
-            price: 1500.0,
-            image:
-              "https://jmb.com.tn/wp-content/uploads/2024/06/clavier-gamer-spirit-of-gamer-xpert-k200-rgb-noir-600x600.jpg",
-            category: "Claviers",
-          },
-          {
-            name: "Clavier Mécanique (puissant)",
-            price: 1700.0,
-            image: "images/clavier2.jpg",
-            category: "Claviers",
-          },
-          {
-            name: "Clavier Normal",
-            price: 200.0,
-            image:
-              "https://rightech.ma/2774-medium_default/clavier-dell-multimedia-keyboard-kb216-azerty-noir.webp",
-            category: "Claviers",
-          },
-          {
-            name: "Clavier Normal Standard",
-            price: 250.0,
-            image: "images/clavier4.jpg",
-            category: "Claviers",
-          },
-        ];
-        const localStorageProducts =
-          JSON.parse(localStorage.getItem("products")) || [];
-        const totalProducts =
-          existingProducts.length + localStorageProducts.length;
-        document.getElementById("totalProducts").textContent = totalProducts;
-      }
-
-      function loadUserData() {
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        const totalClients = users.filter(
-          (user) => user.type_utilisateur === "client"
-        ).length;
-        const totalVendors = users.filter(
-          (user) => user.type_utilisateur === "Vendeur"
-        ).length;
-
-        document.getElementById("totalClients").textContent = totalClients;
-        document.getElementById("totalVendors").textContent = totalVendors;
-      }
-
-      function loadOrdersData() {
-        const orders = JSON.parse(localStorage.getItem("orders")) || [];
-        document.getElementById("totalOrders").textContent = orders.length;
-
-        const recentOrdersContainer = document.getElementById("recentOrders");
-        const recentOrders = orders.slice(-5).reverse();
-
-        if (recentOrders.length === 0) {
-          recentOrdersContainer.innerHTML = `
-                    <tr>
-                        <td colspan="4" class="text-center">Aucune commande disponible</td>
-                    </tr>
-                `;
-        } else {
-          recentOrdersContainer.innerHTML = recentOrders
-            .map(
-              (order) => `
-                    <tr>
-                        <td>${getDayOfWeek(new Date(order.date))}</td>
-                        <td>${order.customer.firstName} ${
-                order.customer.lastName
-              }</td>
-                        <td>${order.items
-                          .map((item) => item.name)
-                          .join(", ")}</td>
-                        <td>${order.total.toFixed(2)} DH</td>
-                    </tr>
-                `
-            )
-            .join("");
-        }
-      }
-
-      function getDayOfWeek(date) {
+      function formatDate(date) {
         const days = [
           "Dimanche",
           "Lundi",
@@ -655,6 +393,3 @@
       }
     </script>
 @endsection <!-- Ici finit le contenu spécifique à cette page -->
-
-
-

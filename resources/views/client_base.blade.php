@@ -24,7 +24,6 @@
     <link rel="stylesheet" href="{{ asset('assets/css/shop.css')}}" />
     <link rel="stylesheet" href="{{ asset('assets/css/shopspe.css')}}" />
     <link rel="stylesheet" href="{{ asset('assets/css/profileclient.css')}}" />
-    <script src="{{ asset('assets/js/shop.js')}}"></script>
     <title>{{ $page ?? 'ShopAll - Home' }}</title>
   </head>
 
@@ -73,18 +72,18 @@
           <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
             <li>
               <a class="nav-link" href="{{url('/client_profile')}}"
-                ><img src="../images/user.svg"
+                ><img src="{{ asset('images/user.svg') }}"
               /></a>
             </li>
             <li>
               <a class="nav-link" href="{{url('/client_cart')}}"
-                ><img src="../images/cart.svg"
+                ><img src="{{ asset('images/cart.svg') }}"
               /></a>
             </li>
             <li>
               <a class="nav-link" href="{{url('/')}}"
                 ><img
-                  src="../images/logout2.png"
+                  src="{{ asset('images/logout2.png') }}"
                   style="height: 30px; width: 30px; margin-left: 15px"
               /></a>
             </li>
@@ -94,14 +93,12 @@
     </nav>
     <!-- End Header/Navigation -->
     @yield('content')
-    
-
 
     <!-- Start Footer Section -->
     <footer class="footer-section">
       <div class="container relative">
         <div class="sofa-img">
-          <img src="../images/sofa.png" alt="Image" class="img-fluid" />
+          <img src="{{ asset('images/sofa.png') }}" alt="Image" class="img-fluid" />
         </div>
 
         <div class="row">
@@ -110,10 +107,11 @@
               <h3 class="d-flex align-items-center">
                 <span class="me-1"
                   ><img
-                    src="../images/envelope-outline.svg"
+                    src="{{ asset('images/envelope-outline.svg') }}"
                     alt="Image"
-                    class="img-fluid" /></span
-                ><span>Subscribe to Newsletter</span>
+                    class="img-fluid"
+                /></span>
+                <span>Abonnez-vous à la Newsletter</span>
               </h3>
 
               <form action="#" class="row g-3">
@@ -121,14 +119,14 @@
                   <input
                     type="text"
                     class="form-control"
-                    placeholder="Enter your name"
+                    placeholder="Entrez votre nom"
                   />
                 </div>
                 <div class="col-auto">
                   <input
                     type="email"
                     class="form-control"
-                    placeholder="Enter your email"
+                    placeholder="Entrez votre email"
                   />
                 </div>
                 <div class="col-auto">
@@ -144,13 +142,12 @@
         <div class="row g-5 mb-5">
           <div class="col-lg-4">
             <div class="mb-4 footer-logo-wrap">
-              <a href="#" class="footer-logo">Furni<span>.</span></a>
+              <a href="#" class="footer-logo">ShopAll<span>.</span></a>
             </div>
             <p class="mb-4">
-              La facilitation commence par un pur blocage du travail. Nous vous
-              offrons une alternative à cette situation. Ensemble, nous
-              trouverons une solution pour améliorer ce processus. Le confort
-              d'un Client est essentiel
+              Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis
+              nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate
+              velit imperdiet dolor tempor tristique. Pellentesque habitant
             </p>
 
             <ul class="list-unstyled custom-social">
@@ -173,27 +170,27 @@
             <div class="row links-wrap">
               <div class="col-6 col-sm-6 col-md-3">
                 <ul class="list-unstyled">
-                  <li><a href="#">About us</a></li>
+                  <li><a href="#">À propos de nous</a></li>
                   <li><a href="#">Services</a></li>
                   <li><a href="#">Blog</a></li>
-                  <li><a href="#">Contact us</a></li>
+                  <li><a href="#">Contactez-nous</a></li>
                 </ul>
               </div>
 
               <div class="col-6 col-sm-6 col-md-3">
                 <ul class="list-unstyled">
                   <li><a href="#">Support</a></li>
-                  <li><a href="#">Knowledge base</a></li>
-                  <li><a href="#">Live chat</a></li>
+                  <li><a href="#">Base de connaissances</a></li>
+                  <li><a href="#">Chat en direct</a></li>
                 </ul>
               </div>
 
               <div class="col-6 col-sm-6 col-md-3">
                 <ul class="list-unstyled">
-                  <li><a href="#">Jobs</a></li>
-                  <li><a href="#">Our team</a></li>
+                  <li><a href="#">Emplois</a></li>
+                  <li><a href="#">Notre équipe</a></li>
                   <li><a href="#">Leadership</a></li>
-                  <li><a href="#">Privacy Policy</a></li>
+                  <li><a href="#">Politique de confidentialité</a></li>
                 </ul>
               </div>
 
@@ -216,14 +213,19 @@
                 <script>
                   document.write(new Date().getFullYear());
                 </script>
-                . Tous droits réservés.
+                . Tous droits réservés. &mdash; Conçu avec
+                <span class="text-danger">❤</span> par
+                <a href="https://untree.co">Untree.co</a>
+                <!-- License information: https://untree.co/license/ -->
               </p>
             </div>
 
             <div class="col-lg-6 text-center text-lg-end">
               <ul class="list-unstyled d-inline-flex ms-auto">
-                <li class="me-4"><a href="#">Terms &amp; Conditions</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li class="me-4">
+                  <a href="#">Termes &amp; Conditions</a>
+                </li>
+                <li><a href="#">Politique de confidentialité</a></li>
               </ul>
             </div>
           </div>
@@ -232,20 +234,26 @@
     </footer>
     <!-- End Footer Section -->
 
-    <script src="{{ asset('assets/js/bootstrap.bundle.min.js')}}"></script>
-	<script src="{{ asset('assets/js/tiny-slider.js')}}"></script>
-	<script src="{{ asset('assets/js/custom.js')}}"></script>
-  <script src="{{ asset('assets/js/cart.js')}}"></script>
-  <script src="{{ asset('assets/js/checkout.js')}}"></script>
-    <script src="{{ asset('assets/js/contact.js')}}"></script>
-    <script
-      type="text/javascript"
-      src="https://cdn.emailjs.com/dist/email.min.js"
-    ></script>
-    <script src="{{ asset('assets/js/boutique.js')}}"></script>
+    <!-- Scripts -->
+    <script src="{{ asset('assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/js/tiny-slider.js') }}"></script>
+    <script src="{{ asset('assets/js/custom.js') }}"></script>
     
-
-
-
+    <!-- Page-specific scripts -->
+    @if(request()->is('client_shop'))
+    <script src="{{ asset('assets/js/boutique.js') }}"></script>
+    @endif
+    
+    @if(request()->is('client_cart'))
+    <script src="{{ asset('assets/js/cart.js') }}"></script>
+    @endif
+    
+    @if(request()->is('client/checkout'))
+    <script src="{{ asset('assets/js/checkout.js') }}"></script>
+    @endif
+    
+    @if(request()->is('client_contact'))
+    <script src="{{ asset('assets/js/contact.js') }}"></script>
+    @endif
   </body>
 </html>

@@ -14,8 +14,9 @@ return new class extends Migration {
             $table->foreignId('commande_id')->constrained();
             $table->foreignId('produit_id')->constrained();
             $table->integer('quantite');
-            $table->primary(['commande_id', 'produit_id']); });
-
+            $table->primary(['commande_id', 'produit_id']);
+            $table->timestamps(); // Ajout des timestamps
+        });
     }
 
     /**

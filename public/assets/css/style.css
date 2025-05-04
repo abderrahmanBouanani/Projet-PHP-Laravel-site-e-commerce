@@ -143,7 +143,7 @@ a {
       position: absolute;
       width: 255px;
       height: 217px;
-      background-image: url("../images/dots-light.svg");
+      background-image: url("../../images/dots-light.svg");
       background-size: contain;
       background-repeat: no-repeat;
       right: -100px;
@@ -206,7 +206,8 @@ a {
       top: 0;
       -webkit-transition: .3s all ease;
       -o-transition: .3s all ease;
-      transition: .3s all ease; }
+      transition: .3s all ease;
+    }
     .product-section .product-item h3 {
       font-weight: 600;
       font-size: 16px; }
@@ -763,5 +764,10 @@ textarea {
   height: auto;
   margin-left: 500px;
   margin-top: -300px;
+}
+
+.img-fluid {
+  max-width: 100%;
+  height: auto;
 }
 

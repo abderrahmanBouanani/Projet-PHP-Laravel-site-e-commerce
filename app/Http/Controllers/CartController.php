@@ -58,13 +58,39 @@ class CartController extends Controller
     // Méthode pour récupérer tous les éléments du panier
     public function getCart()
     {
-        // Récupérer l'ID du client (utilisateur connecté ou session)
-        $clientId = session('user')['id'];
-        
-        // Récupérer les éléments du panier
-        $cartItems = Cart::where('client_id', $clientId)->get();
-        
-        return response()->json($cartItems);
+        try {
+            \Log::info('Début de getCart');
+            \Log::info('Session complète:', session()->all());
+            
+            // Vérifier si l'utilisateur est connecté
+            if (!session('user')) {
+                \Log::warning('Utilisateur non connecté dans getCart');
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Veuillez vous connecter pour accéder à votre panier'
+                ], 401);
+            }
+
+            // Récupérer l'ID du client
+            $clientId = session('user')['id'];
+            \Log::info('ID du client: ' . $clientId);
+            
+            // Récupérer les éléments du panier
+            $cartItems = Cart::where('client_id', $clientId)->get();
+            \Log::info('Produits du panier: ' . $cartItems);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $cartItems
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors du chargement du panier: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du chargement du panier',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     // Méthode pour mettre à jour la quantité d'un élément du panier
@@ -133,36 +159,52 @@ public function updateCartItem(Request $request, $id)
     }
 
     // Méthode pour calculer le total du panier avec réduction
-public function getCartTotal()
-{
-    // Récupérer l'ID du client
-    $clientId = session('user')['id'];
-    
-    // Récupérer les éléments du panier
-    $cartItems = Cart::where('client_id', $clientId)->get();
-    
-    // Calculer le sous-total
-    $subtotal = $cartItems->sum(function($item) {
-        return $item->prix * ($item->quantity ?? 1);
-    });
-    
-    // Récupérer la réduction du coupon si elle existe
-    $discount = 0;
-    if (session()->has('coupon')) {
-        $coupon = session()->get('coupon');
-        $discount = $coupon['discount_amount'];
+    public function getCartTotal()
+    {
+        try {
+            \Log::info('Début de getCartTotal');
+            
+            // Récupérer l'ID du client
+            $clientId = session('user')['id'];
+            \Log::info('ID du client: ' . $clientId);
+            
+            // Récupérer les éléments du panier
+            $cartItems = Cart::where('client_id', $clientId)->get();
+            \Log::info('Produits du panier: ' . $cartItems);
+            
+            // Calculer le sous-total
+            $subtotal = $cartItems->sum(function($item) {
+                return $item->prix * $item->quantite;
+            });
+            \Log::info('Sous-total calculé: ' . $subtotal);
+            
+            // Récupérer la réduction du coupon si elle existe
+            $discount = 0;
+            if (session()->has('coupon')) {
+                $coupon = session()->get('coupon');
+                $discount = $coupon['discount_amount'];
+                \Log::info('Réduction appliquée: ' . $discount);
+            }
+            
+            // Calculer le total
+            $total = $subtotal - $discount;
+            \Log::info('Total calculé: ' . $total);
+            
+            return response()->json([
+                'subtotal' => $subtotal,
+                'discount' => $discount,
+                'total' => $total,
+                'coupon' => session()->get('coupon')
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Erreur dans getCartTotal: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du calcul des totaux',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-    
-    // Calculer le total
-    $total = $subtotal - $discount;
-    
-    return response()->json([
-        'subtotal' => $subtotal,
-        'discount' => $discount,
-        'total' => $total,
-        'coupon' => session()->get('coupon')
-    ]);
-}
 
 
 

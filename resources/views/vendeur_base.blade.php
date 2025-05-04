@@ -67,13 +67,13 @@
           <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
             <li>
               <a class="nav-link" href="{{url('/vendeur_profile')}}"
-                ><img src="../images/user.svg"
+                ><img src="{{ asset('images/user.svg') }}"
               /></a>
             </li>
             <li>
               <a class="nav-link" href="{{url('/')}}"
                 ><img
-                  src="../images/logout2.png"
+                  src="{{ asset('images/logout2.png') }}"
                   style="height: 30px; width: 30px; margin-left: 15px"
               /></a>
             </li>
@@ -89,7 +89,7 @@
     <footer class="footer-section">
       <div class="container relative">
         <div class="sofa-img">
-          <img src="../images/sofa.png" alt="Image" class="img-fluid" />
+          <img src="{{ asset('images/sofa.png') }}" alt="Image" class="img-fluid" />
         </div>
 
         <div class="row">
@@ -98,7 +98,7 @@
               <h3 class="d-flex align-items-center">
                 <span class="me-1"
                   ><img
-                    src="../images/envelope-outline.svg"
+                    src="{{ asset('images/envelope-outline.svg') }}"
                     alt="Image"
                     class="img-fluid" /></span
                 ><span>Subscribe to Newsletter</span>

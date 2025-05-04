@@ -5,18 +5,42 @@
       <div class="container">
         <div class="user-info-card">
           <h2 class="text-center mb-4">Informations de votre compte</h2>
-          <div id="userInfo" class="row">
-            <!-- Les informations du livreur seront affichées ici -->
-            @if ($user)
-        <p><strong>Nom :</strong> {{ $user['nom'] }}</p>
-        <p><strong>Prénom :</strong> {{ $user['prenom'] }}</p>
-        <p><strong>Email :</strong> {{ $user['email'] }}</p>
-        <p><strong>Téléphone :</strong> {{ $user['telephone'] }}</p>
-        <p><strong>Type d'utilisateur :</strong> {{ $user['type'] }}</p>
-      @else
-        <p>Aucune information disponible. Veuillez vous connecter d'abord.</p>
-      @endif
-          </div>
+          @if(session('user'))
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <div class="user-info-item">
+                  <span class="user-info-label">Nom :</span>
+                  <span class="user-info-value">{{ session('user')['nom'] }}</span>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="user-info-item">
+                  <span class="user-info-label">Prénom :</span>
+                  <span class="user-info-value">{{ session('user')['prenom'] }}</span>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="user-info-item">
+                  <span class="user-info-label">Email :</span>
+                  <span class="user-info-value">{{ session('user')['email'] }}</span>
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <div class="user-info-item">
+                  <span class="user-info-label">Téléphone :</span>
+                  <span class="user-info-value">{{ session('user')['telephone'] }}</span>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="user-info-item">
+                  <span class="user-info-label">Type d'utilisateur :</span>
+                  <span class="user-info-value">{{ session('user')['type'] }}</span>
+                </div>
+              </div>
+            </div>
+          @else
+            <p class="text-center">Aucune information disponible. Veuillez vous connecter d'abord.</p>
+          @endif
           <div class="text-center mt-4">
             <button id="editProfileBtn" class="btn btn-edit">
               Modifier le profil
@@ -51,7 +75,7 @@
             <form id="editProfileForm">
               <div class="mb-3">
                 <label for="editNom" class="form-label">Nom</label>
-                <input type="text" class="form-control" id="editNom" required />
+                <input type="text" class="form-control" id="editNom" value="{{ session('user')['nom'] ?? '' }}" required />
               </div>
               <div class="mb-3">
                 <label for="editPrenom" class="form-label">Prénom</label>
@@ -59,6 +83,7 @@
                   type="text"
                   class="form-control"
                   id="editPrenom"
+                  value="{{ session('user')['prenom'] ?? '' }}"
                   required
                 />
               </div>
@@ -68,6 +93,7 @@
                   type="email"
                   class="form-control"
                   id="editEmail"
+                  value="{{ session('user')['email'] ?? '' }}"
                   required
                 />
               </div>
@@ -77,6 +103,7 @@
                   type="tel"
                   class="form-control"
                   id="editTelephone"
+                  value="{{ session('user')['telephone'] ?? '' }}"
                   required
                 />
               </div>

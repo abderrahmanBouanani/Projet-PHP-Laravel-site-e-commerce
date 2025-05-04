@@ -4,6 +4,10 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CouponController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\AdminProductController;
+use App\Http\Controllers\AdminOrderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProduitController; // Ensure this controller exists in the specified namespace
 use App\Models\Cart;
@@ -11,8 +15,9 @@ use App\Models\Produit;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Http\Client\Request as ClientRequest;
 use Illuminate\Http\Request as HttpRequest;
+use App\Http\Controllers\LivreurController;
 
-// ---connexion & signu--- 
+// ---connexion & signup--- 
 
 // Afficher le formulaire de connexion
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -75,22 +80,6 @@ Route::get('/api/cart/get-totals', [App\Http\Controllers\CartController::class, 
 Route::post('/api/orders/create', [App\Http\Controllers\OrderController::class, 'createOrder']);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Routes pour le client
 Route::get('/client_home', function () {
     return view('client-interface.index', ['page' => 'ShopAll - Home']);
@@ -134,25 +123,34 @@ Route::get('/client/checkout', function () {
 
 
 //Routes pour l'admin
-Route::get('/admin_home', function () {
-    return view('admin-interface.dashboard',['page' => 'ShopAll - Tableau de Bord']);
+Route::prefix('admin')->group(function () {
+    Route::get('/home', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/dashboard/recent-orders', [AdminDashboardController::class, 'recentOrders'])->name('admin.dashboard.recent-orders');
+    Route::get('/dashboard/chart-data', [AdminDashboardController::class, 'chartData'])->name('admin.dashboard.chart-data');
+    Route::get('/commande', [AdminOrderController::class, 'index'])->name('admin.commandes');
+    Route::get('/commande/{id}', [AdminOrderController::class, 'show'])->name('admin.commande.show');
+    Route::post('/commande/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('admin.commande.status');
+    Route::get('/api/products/{commandeId}', [AdminOrderController::class, 'getProducts'])->name('admin.api.products');
+    Route::get('/commande/search', [AdminOrderController::class, 'search'])->name('admin.commande.search');
+    
+    Route::get('/about', [AdminController::class, 'profile'])->name('admin.profile');
+    Route::post('/about', [AdminController::class, 'updateProfile'])->name('admin.profile.update');
+    
+    Route::get('/produit', [AdminProductController::class, 'index'])->name('admin.produits');
+    Route::get('/produit/search', [AdminProductController::class, 'search'])->name('admin.produit.search');
+    Route::get('/produit/categories', [AdminProductController::class, 'getCategories'])->name('admin.produit.categories');
+    
+    Route::get('/utilisateur', [AdminUserController::class, 'index'])->name('admin.utilisateurs');
+    Route::get('/utilisateur/{id}', [AdminUserController::class, 'show'])->name('admin.utilisateur.show');
+    Route::delete('/utilisateur/{id}', [AdminUserController::class, 'destroy'])->name('admin.utilisateur.destroy');
 });
 
-Route::get('/admin_commande', function () {
-    return view('admin-interface.commandes',['page' => 'ShopAll - Commandes']);
-});
-
-Route::get('/admin_about', function () {
-    return view('admin-interface.about',['page' => 'ShopAll - Profil']);
-});
-
-Route::get('/admin_produit', function () {
-    return view('admin-interface.produits',['page' => 'ShopAll - Produits']);
-});
-
-Route::get('/admin_utilisateur', function () {
-    return view('admin-interface.Utilisateur',['page' => 'ShopAll - Utilisateurs']);
-});
+// Anciennes routes admin (à garder temporairement pour la compatibilité)
+Route::get('/admin_home', [AdminController::class, 'dashboard']);
+Route::get('/admin_commande', [AdminOrderController::class, 'index']);
+Route::get('/admin_about', [AdminController::class, 'profile']);
+Route::get('/admin_produit', [AdminProductController::class, 'index']);
+Route::get('/admin_utilisateur', [AdminUserController::class, 'index']);
 
 //Routes pour le vendeur
 
@@ -180,14 +178,14 @@ Route::get('/vendeur_service',function(){
 
 //Routes pour le livreur
 
-Route::get('/livreur_livraison',function(){
-    return view('delivery interface.livraisons');
-});
+Route::get('/livreur_livraison', [LivreurController::class, 'index']);
+Route::post('/livreur/commande/{id}/accepter', [LivreurController::class, 'accepter']);
+Route::post('/livreur/commande/{id}/livree', [LivreurController::class, 'livree']);
+Route::post('/livreur/commande/{id}/update-status', [LivreurController::class, 'updateStatus']);
+Route::get('/livreur/commande/{id}/produits', [LivreurController::class, 'getProducts']);
 
 Route::get('/livreur_profile',function(){
     return view('delivery interface.profil-livreur',['user' => session('user')]);
 });
 
-
-
-
+Route::post('/livreur/profile/update', [LivreurController::class, 'updateProfile']);

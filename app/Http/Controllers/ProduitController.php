@@ -72,8 +72,20 @@ class ProduitController extends Controller
 }
     //Récuperation
     public function getProduits(){
-        $produits = Produit::all();
-        return response()->json($produits);
+        try {
+            $produits = Produit::with(['vendeur'])->get();
+            return response()->json([
+                'success' => true,
+                'data' => $produits
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors du chargement des produits: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors du chargement des produits',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
  
 }

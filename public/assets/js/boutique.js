@@ -4,7 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return fetch("http://127.0.0.1:8000/api/produits")
       .then((response) => response.json())
       .then((data) => {
-        return data
+        if (data.success && Array.isArray(data.data)) {
+          return data.data;
+        } else {
+          console.error("Format de données invalide:", data);
+          return [];
+        }
       })
       .catch((error) => console.error("Erreur lors de la récupération des produits:", error))
   }
@@ -12,7 +17,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // Fonction pour afficher les produits
   function displayProducts(productsToDisplay) {
     const productList = document.getElementById("product-list")
+    if (!productList) {
+      console.error("L'élément product-list n'a pas été trouvé dans le DOM")
+      return
+    }
+    
     productList.innerHTML = "" // Vide le conteneur avant d'afficher les produits
+
+    if (!Array.isArray(productsToDisplay)) {
+      console.error("productsToDisplay n'est pas un tableau:", productsToDisplay)
+      return
+    }
 
     productsToDisplay.forEach((product) => {
       const productElement = document.createElement("div")

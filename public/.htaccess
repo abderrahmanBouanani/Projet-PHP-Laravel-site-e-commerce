@@ -23,3 +23,12 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Enable directory browsing
+Options +Indexes
+
+# Allow access to all files
+<FilesMatch ".*">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>

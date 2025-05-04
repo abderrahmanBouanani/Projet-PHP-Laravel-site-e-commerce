@@ -1,119 +1,152 @@
 document.addEventListener("DOMContentLoaded", () => {
+    console.log("DOM chargé, initialisation du checkout...");
+    
     // Charger les produits du panier dans le résumé de commande
-    displayOrderSummary()
+    displayOrderSummary();
   
     // Écouter l'événement sur le bouton de passer la commande
-    document.getElementById("place-order")?.addEventListener("click", placeOrder)
-  })
+    const placeOrderButton = document.getElementById("place-order");
+    if (placeOrderButton) {
+        placeOrderButton.addEventListener("click", placeOrder);
+    } else {
+        console.error("Le bouton place-order n'a pas été trouvé");
+    }
+});
   
-  // Fonction pour afficher les produits du panier dans le résumé de commande
-  function displayOrderSummary() {
+// Fonction pour afficher les produits du panier dans le résumé de commande
+function displayOrderSummary() {
+    const orderSummaryContainer = document.getElementById("order-summary");
+    if (!orderSummaryContainer) {
+        console.error("L'élément order-summary n'a pas été trouvé dans le DOM");
+        return;
+    }
+
+    console.log("Récupération des totaux de la session...");
+  
     // D'abord, récupérer les totaux de la session
-    fetch("http://127.0.0.1:8000/api/cart/get-totals", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
-      }
+    fetch("/cart/total", {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
+        }
     })
-      .then(response => response.json())
-      .then(sessionData => {
-        console.log("Données de session récupérées:", sessionData)
+    .then(response => {
+        console.log("Réponse de /cart/total:", response.status);
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(sessionData => {
+        console.log("Données de session récupérées:", sessionData);
         
         // Ensuite, récupérer les produits du panier
-        fetch("http://127.0.0.1:8000/cart")
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Erreur lors du chargement des produits du panier")
+        console.log("Récupération des produits du panier...");
+        return fetch("/cart", {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content
             }
-            return response.json()
-          })
-          .then((data) => {
-            const orderSummaryContainer = document.getElementById("order-summary")
-            orderSummaryContainer.innerHTML = "" // Vider le tableau avant d'ajouter de nouveaux éléments
+        })
+        .then(response => {
+            console.log("Réponse de /cart:", response.status);
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Produits du panier récupérés:", data);
+            
+            orderSummaryContainer.innerHTML = ""; // Vider le tableau avant d'ajouter de nouveaux éléments
   
-            if (data.length === 0) {
-              orderSummaryContainer.innerHTML = "<tr><td colspan='2'>Panier vide</td></tr>"
-              return
+            if (!data || !data.success || !data.data || data.data.length === 0) {
+                console.log("Panier vide ou données invalides:", data);
+                orderSummaryContainer.innerHTML = "<tr><td colspan='2'>Panier vide</td></tr>";
+                return;
             }
   
             // Calculer le sous-total à partir des produits
-            let calculatedSubtotal = 0
+            let calculatedSubtotal = 0;
             
             // Ajouter chaque produit au résumé de commande
-            data.forEach((item) => {
-              const itemTotal = item.prix * item.quantite
-              calculatedSubtotal += itemTotal
+            data.data.forEach((item) => {
+                console.log("Traitement du produit:", item);
+                const itemTotal = item.prix * item.quantite;
+                calculatedSubtotal += itemTotal;
   
-              const row = document.createElement("tr")
-              row.innerHTML = `
-                <td>${item.nom_produit} <strong class="mx-2">×</strong> ${item.quantite}</td>
-                <td>${itemTotal.toFixed(2)} DH</td>
-              `
-              orderSummaryContainer.appendChild(row)
-            })
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.nom_produit} <strong class="mx-2">×</strong> ${item.quantite}</td>
+                    <td>${itemTotal.toFixed(2)} DH</td>
+                `;
+                orderSummaryContainer.appendChild(row);
+            });
   
             // Utiliser les totaux de la session ou calculer si non disponibles
-            const subtotal = sessionData.subtotal || calculatedSubtotal
-            const discount = sessionData.discount || 0
-            const total = sessionData.total || (subtotal - discount)
+            const subtotal = sessionData.subtotal || calculatedSubtotal;
+            const discount = sessionData.discount || 0;
+            const total = sessionData.total || (subtotal - discount);
   
-            console.log("Totaux utilisés:", {
-              subtotal: subtotal,
-              discount: discount,
-              total: total
-            })
+            console.log("Totaux calculés:", {
+                subtotal: subtotal,
+                discount: discount,
+                total: total
+            });
   
             // Ajouter la ligne de sous-total
-            const subtotalRow = document.createElement("tr")
+            const subtotalRow = document.createElement("tr");
             subtotalRow.innerHTML = `
-              <td class="text-black font-weight-bold"><strong>Sous-total</strong></td>
-              <td class="text-black">${subtotal.toFixed(2)} DH</td>
-            `
-            orderSummaryContainer.appendChild(subtotalRow)
+                <td class="text-black font-weight-bold"><strong>Sous-total</strong></td>
+                <td class="text-black">${subtotal.toFixed(2)} DH</td>
+            `;
+            orderSummaryContainer.appendChild(subtotalRow);
   
             // Ajouter la ligne de réduction seulement si une réduction est appliquée
             if (discount > 0) {
-              const discountRow = document.createElement("tr")
-              discountRow.innerHTML = `
-                <td class="text-black font-weight-bold"><strong>Réduction</strong></td>
-                <td class="text-black">-${discount.toFixed(2)} DH</td>
-              `
-              orderSummaryContainer.appendChild(discountRow)
-              
-              // Ajouter une ligne pour le code coupon si disponible
-              if (sessionData.coupon_code) {
-                const couponRow = document.createElement("tr")
-                couponRow.innerHTML = `
-                  <td class="text-black"><em>Code coupon: ${sessionData.coupon_code}</em></td>
-                  <td></td>
-                `
-                orderSummaryContainer.appendChild(couponRow)
-              }
+                const discountRow = document.createElement("tr");
+                discountRow.innerHTML = `
+                    <td class="text-black font-weight-bold"><strong>Réduction</strong></td>
+                    <td class="text-black">-${discount.toFixed(2)} DH</td>
+                `;
+                orderSummaryContainer.appendChild(discountRow);
+                
+                // Ajouter une ligne pour le code coupon si disponible
+                if (sessionData.coupon_code) {
+                    const couponRow = document.createElement("tr");
+                    couponRow.innerHTML = `
+                        <td class="text-black"><em>Code coupon: ${sessionData.coupon_code}</em></td>
+                        <td></td>
+                    `;
+                    orderSummaryContainer.appendChild(couponRow);
+                }
             }
   
             // Ajouter la ligne de total
-            const totalRow = document.createElement("tr")
+            const totalRow = document.createElement("tr");
             totalRow.innerHTML = `
-              <td class="text-black font-weight-bold"><strong>Total de la commande</strong></td>
-              <td class="text-black font-weight-bold"><strong>${total.toFixed(2)} DH</strong></td>
-            `
-            orderSummaryContainer.appendChild(totalRow)
-          })
-          .catch((error) => {
-            console.error("Erreur:", error)
-            showNotification(error.message || "Impossible de charger les articles du panier", "error")
-          })
-      })
-      .catch(error => {
-        console.error("Erreur lors de la récupération des totaux de la session:", error)
-        // En cas d'erreur, charger quand même les produits sans les totaux de session
-        displayCartItemsWithoutSession()
-      })
-  }
+                <td class="text-black font-weight-bold"><strong>Total</strong></td>
+                <td class="text-black font-weight-bold"><strong>${total.toFixed(2)} DH</strong></td>
+            `;
+            orderSummaryContainer.appendChild(totalRow);
+        });
+    })
+    .catch(error => {
+        console.error("Erreur lors de la récupération des données:", error);
+        orderSummaryContainer.innerHTML = `
+            <tr>
+                <td colspan="2" class="text-danger">
+                    Erreur lors du chargement des données. Veuillez rafraîchir la page.
+                </td>
+            </tr>
+        `;
+    });
+}
   
-  // Fonction de secours pour afficher les produits sans les totaux de session
-  function displayCartItemsWithoutSession() {
+// Fonction de secours pour afficher les produits sans les totaux de session
+function displayCartItemsWithoutSession() {
     fetch("http://127.0.0.1:8000/cart")
       .then((response) => {
         if (!response.ok) {
