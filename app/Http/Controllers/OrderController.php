@@ -27,7 +27,7 @@ class OrderController extends Controller
             'customer.city' => 'required|string|max:100',
             'customer.state' => 'required|string|max:100',
             'customer.postal_code' => 'required|string|max:20',
-            'payment_method' => 'required|string|in:bank_transfer,paypal',
+            'payment_method' => 'sometimes|string|in:carte,espece',
         ]);
 
         if ($validator->fails()) {
@@ -59,7 +59,7 @@ class OrderController extends Controller
                 'client_id' => $clientId,
                 'adresse' => $request->input('customer.address'),
                 'statut' => 'En attente',
-                'methode_paiement' => $request->input('payment_method'),
+                'methode_paiement' => $request->input('payment_method', 'espece'),
                 'total' => $total,
                 'reduction' => $discount
             ]);
@@ -77,6 +77,27 @@ class OrderController extends Controller
                 'telephone' => $request->input('customer.phone'),
                 'note_commande' => $request->input('customer.notes') ?? '',
             ]);
+
+            // Créer le paiement lié à la commande
+            $typePaiement = $request->input('payment_method', 'espece');
+            $paiementData = [
+                'commande_id' => $commande->id,
+                'montant' => $total,
+                'type' => $typePaiement,
+                'numero_carte' => null,
+                'date_expiration' => null,
+                'email_paypal' => null
+            ];
+            // Si le type est 'carte', on peut ajouter la logique pour récupérer les infos carte si besoin
+            if ($typePaiement === 'carte') {
+                $paiementData['numero_carte'] = $request->input('numero_carte');
+                $paiementData['date_expiration'] = $request->input('date_expiration');
+            }
+            // Si le type est 'paypal', on peut ajouter la logique pour récupérer l'email paypal si besoin
+            if ($typePaiement === 'paypal') {
+                $paiementData['email_paypal'] = $request->input('email_paypal');
+            }
+            \App\Models\Paiement::create($paiementData);
 
             // Récupérer les articles du panier pour les associer à la commande
             $cartItems = Cart::where('client_id', $clientId)->get();

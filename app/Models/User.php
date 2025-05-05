@@ -28,8 +28,8 @@ class User extends Model
         return $this->hasMany(Commande::class, 'client_id');
     }
 
-    public function livraisons()
-    {
-        return $this->hasMany(Livraison::class, 'livreur_id');
-    }
+    // public function livraisons()
+    // {
+    //     return $this->hasMany(Livraison::class, 'livreur_id');
+    // }
 }
