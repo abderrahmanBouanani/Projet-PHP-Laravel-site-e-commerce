@@ -185,7 +185,7 @@ Route::post('/livreur/commande/{id}/update-status', [LivreurController::class, '
 Route::get('/livreur/commande/{id}/produits', [LivreurController::class, 'getProducts']);
 
 Route::get('/livreur_profile',function(){
-    return view('delivery interface.profil-livreur',['user' => session('user')]);
+    return view('livreur-interface.profil-livreur',['user' => session('user')]);
 });
 
 Route::post('/livreur/profile/update', [LivreurController::class, 'updateProfile']);

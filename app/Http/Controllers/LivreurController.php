@@ -16,7 +16,7 @@ class LivreurController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
             
-        return view('delivery interface.livraisons', [
+        return view('livreur-interface.livraisons', [
             'commandes' => $commandes
         ]);
     }
