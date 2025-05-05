@@ -10,38 +10,46 @@ class AdminUserController extends Controller
     /**
      * Affiche la liste des utilisateurs
      */
-    public function index(Request $request)
+    public function index()
     {
-        $userType = $request->query('type');
+        $users = User::all();
+        
+        return view('admin-interface.Utilisateur', [
+            'page' => 'ShopAll - Utilisateurs',
+            'users' => $users
+        ]);
+    }
+
+    /**
+     * Recherche des utilisateurs en fonction des critères
+     */
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search', '');
+        $typeFilter = $request->input('type', 'all');
         
         $query = User::query();
         
-        // Filtrer par type si spécifié
-        if ($userType) {
-            $query->where('type', $userType);
+        // Recherche par nom, email ou téléphone
+        if (!empty($searchTerm)) {
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('nom', 'like', "%{$searchTerm}%")
+                  ->orWhere('prenom', 'like', "%{$searchTerm}%")
+                  ->orWhere('email', 'like', "%{$searchTerm}%")
+                  ->orWhere('telephone', 'like', "%{$searchTerm}%");
+            });
         }
         
-        $users = $query->get();
-        
-        $pageTitle = 'ShopAll - Utilisateurs';
-        $cardTitle = 'Utilisateurs';
-        
-        if ($userType === 'client') {
-            $pageTitle = 'ShopAll - Clients';
-            $cardTitle = 'Clients';
-        } else if ($userType === 'vendeur') {
-            $pageTitle = 'ShopAll - Vendeurs';
-            $cardTitle = 'Vendeurs';
+        // Filtrer par type
+        if ($typeFilter !== 'all') {
+            $query->where('type', $typeFilter);
         }
         
-        return view('admin-interface.Utilisateur', [
-            'page' => $pageTitle,
-            'cardTitle' => $cardTitle,
-            'users' => $users,
-            'userType' => $userType
-        ]);
+        $users = $query->orderBy('nom')->get();
+        
+        return response()->json($users);
     }
-    
+
     /**
      * Affiche les détails d'un utilisateur spécifique
      */

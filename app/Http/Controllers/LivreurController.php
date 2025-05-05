@@ -203,4 +203,33 @@ class LivreurController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Recherche des livraisons en fonction des critères
+     */
+    public function search(Request $request)
+    {
+        $searchTerm = $request->input('search', '');
+        $statusFilter = $request->input('status', 'all');
+        
+        $query = Commande::query();
+        
+        // Recherche par ID ou adresse
+        if (!empty($searchTerm)) {
+            if (is_numeric($searchTerm)) {
+                $query->where('id', $searchTerm);
+            } else {
+                $query->where('adresse', 'like', "%{$searchTerm}%");
+            }
+        }
+        
+        // Filtrer par statut
+        if ($statusFilter !== 'all') {
+            $query->where('statut', $statusFilter);
+        }
+        
+        $commandes = $query->orderBy('created_at', 'desc')->get();
+        
+        return response()->json($commandes);
+    }
 }

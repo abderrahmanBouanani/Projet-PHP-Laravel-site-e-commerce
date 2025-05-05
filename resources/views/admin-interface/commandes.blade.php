@@ -6,13 +6,23 @@
 
       <div class="search-sort-container">
         <div class="row g-3">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <input
               type="text"
               class="form-control"
               id="searchInput"
               placeholder="Rechercher par ID, nom ou date (jj/mm/aaaa)"
             />
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" id="statusFilter">
+              <option value="all">Tous les statuts</option>
+              <option value="En attente">En attente</option>
+              <option value="Confirmée">Confirmée</option>
+              <option value="En cours de livraison">En cours de livraison</option>
+              <option value="Livrée">Livrée</option>
+              <option value="Annulée">Annulée</option>
+            </select>
           </div>
           <div class="col-md-3">
             <select class="form-select" id="sortSelect">
@@ -22,7 +32,7 @@
               <option value="total-asc">Total (croissant)</option>
             </select>
           </div>
-          <div class="col-md-3">
+          <div class="col-md-2">
             <button class="btn btn-outline-primary w-100" id="searchButton">
               Rechercher
             </button>
@@ -138,6 +148,7 @@
       document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("searchButton").addEventListener("click", filterOrders);
         document.getElementById("sortSelect").addEventListener("change", filterOrders);
+        document.getElementById("statusFilter").addEventListener("change", filterOrders);
         
         // Ajouter des écouteurs d'événements pour les boutons "Voir les produits"
         document.querySelectorAll('.show-products').forEach(button => {
@@ -151,9 +162,10 @@
       function filterOrders() {
         const searchTerm = document.getElementById("searchInput").value;
         const sortValue = document.getElementById("sortSelect").value;
+        const statusFilter = document.getElementById("statusFilter").value;
         
         // Appel à l'API de recherche
-        fetch(`/api/admin/commande/search?search=${searchTerm}&sort=${sortValue}`)
+        fetch(`/api/admin/commande/search?search=${searchTerm}&sort=${sortValue}&status=${statusFilter}`)
           .then(response => response.json())
           .then(data => {
             displayOrders(data);
@@ -173,59 +185,26 @@
         }
         
         orders.forEach(order => {
-          const clientName = order.client 
-            ? `${order.client.nom} ${order.client.prenom}` 
-            : 'Client inconnu';
-            
-          const formattedDate = new Date(order.created_at).toLocaleDateString('fr-FR');
-          
-          let statusBadge = '';
-          if (order.statut === 'Confirmée') {
-            statusBadge = '<span class="badge bg-warning text-dark">Confirmée</span>';
-          } else if (order.statut === 'En cours de livraison') {
-            statusBadge = '<span class="badge bg-primary">En cours de livraison</span>';
-          } else if (order.statut === 'Livrée') {
-            statusBadge = '<span class="badge bg-success">Livrée</span>';
-          } else if (order.statut === 'Annulée') {
-            statusBadge = '<span class="badge bg-danger">Annulée</span>';
-          } else {
-            statusBadge = '<span class="badge bg-secondary">En attente</span>';
-          }
-          
-          let actionButtons = '';
-          if (order.statut === 'En attente') {
-            actionButtons = `
-              <form action="/admin/commande/${order.id}/status" method="POST" class="d-inline">
-                @csrf
-                <input type="hidden" name="statut" value="Confirmée">
-                <button type="submit" class="btn btn-sm btn-success me-2">Confirmer</button>
-              </form>
-              <form action="/admin/commande/${order.id}/status" method="POST" class="d-inline">
-                @csrf
-                <input type="hidden" name="statut" value="Annulée">
-                <button type="submit" class="btn btn-sm btn-danger">Annuler</button>
-              </form>
-            `;
-          }
-          
           const row = `
             <tr>
               <td>${order.id}</td>
-              <td>${clientName}</td>
+              <td>
+                ${order.client ? `${order.client.nom} ${order.client.prenom}` : 'Client inconnu'}
+              </td>
               <td>
                 <button class="btn btn-sm btn-link show-products" data-commande-id="${order.id}">
                   Voir les produits
                 </button>
               </td>
-              <td>${formattedDate}</td>
+              <td>${new Date(order.created_at).toLocaleDateString()}</td>
               <td>${parseFloat(order.total || 0).toFixed(2)} DH</td>
-              <td>${statusBadge}</td>
-              <td>${actionButtons}</td>
+              <td>${getStatusBadge(order.statut)}</td>
+              <td>${getActionButtons(order)}</td>
             </tr>
           `;
           ordersList.insertAdjacentHTML("beforeend", row);
         });
-        
+
         // Réattacher les écouteurs d'événements aux nouveaux boutons
         document.querySelectorAll('.show-products').forEach(button => {
           button.addEventListener('click', function() {
@@ -235,79 +214,112 @@
         });
       }
 
-function showProducts(commandeId) {
-  // Add CSRF token to the request headers
-  const headers = {
-    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  };
-
-  // Show loading indicator in the modal
-  const modalProductsList = document.getElementById("modalProductsList");
-  modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Chargement...</span>
-    </div>
-    <p>Chargement des produits...</p>
-  </td></tr>`;
-  
-  // Show the modal immediately with loading indicator
-  const modal = new bootstrap.Modal(document.getElementById("productsModal"));
-  modal.show();
-
-  fetch(`/admin/api/products/${commandeId}`, {
-    method: 'GET',
-    headers: headers,
-    credentials: 'same-origin'
-  })
-    .then(response => {
-      if (!response.ok) {
-        return response.json().then(err => {
-          throw new Error(err.error || 'Erreur serveur');
-        });
+      function getStatusBadge(status) {
+        switch(status) {
+          case 'Confirmée':
+            return '<span class="badge bg-warning text-dark">Confirmée</span>';
+          case 'En cours de livraison':
+            return '<span class="badge bg-primary">En cours de livraison</span>';
+          case 'Livrée':
+            return '<span class="badge bg-success">Livrée</span>';
+          case 'Annulée':
+            return '<span class="badge bg-danger">Annulée</span>';
+          default:
+            return '<span class="badge bg-secondary">En attente</span>';
+        }
       }
-      return response.json();
-    })
-    .then(data => {
-      console.log('Products data:', data); // Debug log
-      
-      modalProductsList.innerHTML = "";
-      
-      if (!data || data.length === 0) {
-        modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">Aucun produit dans cette commande</td></tr>`;
-      } else {
-        // Ensure we're working with an array
-        const products = Array.isArray(data) ? data : [data];
-        products.forEach(item => {
-          const prix = parseFloat(item.prix_unitaire || 0);
-          const quantite = parseInt(item.quantite || 0);
-          const total = prix * quantite;
-          
-          const row = `
-            <tr>
-              <td>${item.nom || 'Produit inconnu'}</td>
-              <td>${quantite}</td>
-              <td>${prix.toFixed(2)} DH</td>
-              <td>${total.toFixed(2)} DH</td>
-            </tr>
+
+      function getActionButtons(order) {
+        if (order.statut === 'En attente') {
+          return `
+            <form action="/admin/commande/${order.id}/status" method="POST" class="d-inline">
+              <input type="hidden" name="_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="statut" value="Confirmée">
+              <button type="submit" class="btn btn-sm btn-success me-2">Confirmer</button>
+            </form>
+            <form action="/admin/commande/${order.id}/status" method="POST" class="d-inline">
+              <input type="hidden" name="_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="statut" value="Annulée">
+              <button type="submit" class="btn btn-sm btn-danger">Annuler</button>
+            </form>
           `;
-          modalProductsList.insertAdjacentHTML("beforeend", row);
-        });
+        }
+        return '';
       }
-    })
-    .catch(error => {
-      console.error('Error loading products:', error);
-      modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center text-danger">
-        <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        Erreur lors du chargement des produits: ${error.message}
-        <p class="mt-2">
-          <button class="btn btn-sm btn-outline-secondary" onclick="showProducts(${commandeId})">
-            <i class="bi bi-arrow-clockwise me-1"></i> Réessayer
-          </button>
-        </p>
-      </td></tr>`;
-    });
-}
+
+      function showProducts(commandeId) {
+        // Add CSRF token to the request headers
+        const headers = {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        };
+
+        // Show loading indicator in the modal
+        const modalProductsList = document.getElementById("modalProductsList");
+        modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
+          </div>
+          <p>Chargement des produits...</p>
+        </td></tr>`;
+        
+        // Show the modal immediately with loading indicator
+        const modal = new bootstrap.Modal(document.getElementById("productsModal"));
+        modal.show();
+
+        fetch(`/admin/api/products/${commandeId}`, {
+          method: 'GET',
+          headers: headers,
+          credentials: 'same-origin'
+        })
+          .then(response => {
+            if (!response.ok) {
+              return response.json().then(err => {
+                throw new Error(err.error || 'Erreur serveur');
+              });
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('Products data:', data); // Debug log
+            
+            modalProductsList.innerHTML = "";
+            
+            if (!data || data.length === 0) {
+              modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">Aucun produit dans cette commande</td></tr>`;
+            } else {
+              // Ensure we're working with an array
+              const products = Array.isArray(data) ? data : [data];
+              products.forEach(item => {
+                const prix = parseFloat(item.prix_unitaire || 0);
+                const quantite = parseInt(item.quantite || 0);
+                const total = prix * quantite;
+                
+                const row = `
+                  <tr>
+                    <td>${item.nom || 'Produit inconnu'}</td>
+                    <td>${quantite}</td>
+                    <td>${prix.toFixed(2)} DH</td>
+                    <td>${total.toFixed(2)} DH</td>
+                  </tr>
+                `;
+                modalProductsList.insertAdjacentHTML("beforeend", row);
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error loading products:', error);
+            modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center text-danger">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              Erreur lors du chargement des produits: ${error.message}
+              <p class="mt-2">
+                <button class="btn btn-sm btn-outline-secondary" onclick="showProducts(${commandeId})">
+                  <i class="bi bi-arrow-clockwise me-1"></i> Réessayer
+                </button>
+              </p>
+            </td></tr>`;
+          });
+      }
     </script>
 @endsection <!-- Ici finit le contenu spécifique à cette page -->

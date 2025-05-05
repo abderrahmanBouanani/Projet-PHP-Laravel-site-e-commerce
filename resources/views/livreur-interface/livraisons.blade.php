@@ -6,7 +6,7 @@
 
       <div class="search-sort-container">
         <div class="row g-3">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <input
               type="text"
               class="form-control"
@@ -23,6 +23,12 @@
             </select>
           </div>
           <div class="col-md-3">
+            <select class="form-select" id="sortSelect">
+              <option value="date-desc">Date (plus récent)</option>
+              <option value="date-asc">Date (plus ancien)</option>
+            </select>
+          </div>
+          <div class="col-md-2">
             <button class="btn btn-outline-primary w-100" id="searchButton">
               Rechercher
             </button>
@@ -40,7 +46,7 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="deliveriesList">
         @foreach($commandes as $commande)
           <tr class="{{ $commande->statut === 'Livrée' ? 'table-success' : '' }}">
             <td>{{ $commande->id }}</td>
@@ -58,7 +64,7 @@
               @endif
             </td>
             <td>
-              <button class="btn btn-sm btn-link" onclick="showProducts({{ $commande->id }})">
+              <button class="btn btn-sm btn-link show-products" data-commande-id="{{ $commande->id }}">
                 Voir les produits
               </button>
               @if($commande->statut === 'Confirmée')
@@ -109,6 +115,189 @@
         </div>
       </div>
     </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("searchButton").addEventListener("click", filterDeliveries);
+        document.getElementById("statusFilter").addEventListener("change", filterDeliveries);
+        document.getElementById("sortSelect").addEventListener("change", filterDeliveries);
+        
+        // Ajouter des écouteurs d'événements pour les boutons "Voir les produits"
+        document.querySelectorAll('.show-products').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-commande-id');
+            showProducts(commandeId);
+          });
+        });
+
+        // Ajouter des écouteurs d'événements pour les boutons d'action
+        document.querySelectorAll('.accepter-commande').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-id');
+            updateStatus(commandeId, 'En cours de livraison');
+          });
+        });
+
+        document.querySelectorAll('.livree-commande').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-id');
+            updateStatus(commandeId, 'Livrée');
+          });
+        });
+      });
+
+      function filterDeliveries() {
+        const searchTerm = document.getElementById("searchInput").value;
+        const statusFilter = document.getElementById("statusFilter").value;
+        const sortValue = document.getElementById("sortSelect").value;
+        
+        // Appel à l'API de recherche
+        fetch(`/api/livreur/livraison/search?search=${searchTerm}&status=${statusFilter}&sort=${sortValue}`)
+          .then(response => response.json())
+          .then(data => {
+            displayDeliveries(data);
+          })
+          .catch(error => {
+            console.error('Error searching deliveries:', error);
+          });
+      }
+
+      function displayDeliveries(deliveries) {
+        const deliveriesList = document.getElementById("deliveriesList");
+        deliveriesList.innerHTML = "";
+        
+        if (deliveries.length === 0) {
+          deliveriesList.innerHTML = `<tr><td colspan="5" class="text-center">Aucune livraison trouvée</td></tr>`;
+          return;
+        }
+        
+        deliveries.forEach(delivery => {
+          const row = `
+            <tr class="${delivery.statut === 'Livrée' ? 'table-success' : ''}">
+              <td>${delivery.id}</td>
+              <td>${delivery.adresse}</td>
+              <td>${new Date(delivery.created_at).toLocaleDateString()}</td>
+              <td>${getStatusBadge(delivery.statut)}</td>
+              <td>
+                <button class="btn btn-sm btn-link show-products" data-commande-id="${delivery.id}">
+                  Voir les produits
+                </button>
+                ${getActionButtons(delivery)}
+              </td>
+            </tr>
+          `;
+          deliveriesList.insertAdjacentHTML("beforeend", row);
+        });
+
+        // Réattacher les écouteurs d'événements
+        document.querySelectorAll('.show-products').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-commande-id');
+            showProducts(commandeId);
+          });
+        });
+
+        document.querySelectorAll('.accepter-commande').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-id');
+            updateStatus(commandeId, 'En cours de livraison');
+          });
+        });
+
+        document.querySelectorAll('.livree-commande').forEach(button => {
+          button.addEventListener('click', function() {
+            const commandeId = this.getAttribute('data-id');
+            updateStatus(commandeId, 'Livrée');
+          });
+        });
+      }
+
+      function getStatusBadge(status) {
+        switch(status) {
+          case 'Confirmée':
+            return '<span class="badge bg-warning text-dark">En attente</span>';
+          case 'En cours de livraison':
+            return '<span class="badge bg-primary">En cours</span>';
+          case 'Livrée':
+            return '<span class="badge bg-success">Livrée</span>';
+          default:
+            return `<span class="badge bg-secondary">${status}</span>`;
+        }
+      }
+
+      function getActionButtons(delivery) {
+        let buttons = '';
+        if (delivery.statut === 'Confirmée') {
+          buttons += `
+            <button class="btn btn-sm btn-primary accepter-commande" data-id="${delivery.id}">
+              Accepter
+            </button>
+          `;
+        } else if (delivery.statut === 'En cours de livraison') {
+          buttons += `
+            <button class="btn btn-sm btn-success livree-commande" data-id="${delivery.id}">
+              Livrée
+            </button>
+          `;
+        }
+        return buttons;
+      }
+
+      function updateStatus(commandeId, newStatus) {
+        fetch(`/livreur/commande/${commandeId}/update-status`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+          },
+          body: JSON.stringify({ statut: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            filterDeliveries(); // Rafraîchir la liste
+          } else {
+            alert('Erreur lors de la mise à jour du statut');
+          }
+        })
+        .catch(error => {
+          console.error('Error updating status:', error);
+          alert('Erreur lors de la mise à jour du statut');
+        });
+      }
+
+      function showProducts(commandeId) {
+        fetch(`/livreur/commande/${commandeId}/produits`)
+          .then(response => response.json())
+          .then(data => {
+            const modalProductsList = document.getElementById("modalProductsList");
+            modalProductsList.innerHTML = "";
+            
+            if (data.length === 0) {
+              modalProductsList.innerHTML = `<tr><td colspan="4" class="text-center">Aucun produit dans cette commande</td></tr>`;
+            } else {
+              data.forEach(item => {
+                const row = `
+                  <tr>
+                    <td>${item.nom}</td>
+                    <td>${item.quantite}</td>
+                    <td>${parseFloat(item.prix_unitaire).toFixed(2)} DH</td>
+                    <td>${(parseFloat(item.prix_unitaire) * parseInt(item.quantite)).toFixed(2)} DH</td>
+                  </tr>
+                `;
+                modalProductsList.insertAdjacentHTML("beforeend", row);
+              });
+            }
+            
+            const modal = new bootstrap.Modal(document.getElementById("productsModal"));
+            modal.show();
+          })
+          .catch(error => {
+            console.error('Error loading products:', error);
+            alert('Erreur lors du chargement des produits');
+          });
+      }
+    </script>
 @endsection <!-- Ici finit le contenu spécifique à cette page -->
 
 

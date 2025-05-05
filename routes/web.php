@@ -192,3 +192,9 @@ Route::post('/livreur/profile/update', [LivreurController::class, 'updateProfile
 
 // Routes pour le livreur
 Route::post('/livreur/update-profile', [LivreurController::class, 'updateProfile'])->name('livreur.updateProfile');
+
+// Routes API pour la recherche
+Route::get('/api/admin/commande/search', [AdminOrderController::class, 'search']);
+Route::get('/api/admin/produit/search', [AdminProductController::class, 'search']);
+Route::get('/api/livreur/livraison/search', [LivreurController::class, 'search']);
+Route::get('/api/admin/users/search', [AdminUserController::class, 'search']);
