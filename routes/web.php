@@ -189,3 +189,6 @@ Route::get('/livreur_profile',function(){
 });
 
 Route::post('/livreur/profile/update', [LivreurController::class, 'updateProfile']);
+
+// Routes pour le livreur
+Route::post('/livreur/update-profile', [LivreurController::class, 'updateProfile'])->name('livreur.updateProfile');

@@ -154,15 +154,38 @@ class LivreurController extends Controller
                 ], 401);
             }
 
-            // Mettre à jour les informations de l'utilisateur
-            $user['nom'] = $request->input('nom');
-            $user['prenom'] = $request->input('prenom');
-            $user['email'] = $request->input('email');
-            $user['telephone'] = $request->input('telephone');
+            // Validation des données
+            $validated = $request->validate([
+                'nom' => 'required|string|max:255',
+                'prenom' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'telephone' => 'required|string|max:20',
+                'motdepasse' => 'nullable|string|min:6'
+            ]);
+
+            // Mettre à jour les informations dans la base de données
+            DB::table('users')
+                ->where('id', $user['id'])
+                ->update([
+                    'nom' => $validated['nom'],
+                    'prenom' => $validated['prenom'],
+                    'email' => $validated['email'],
+                    'telephone' => $validated['telephone'],
+                    'updated_at' => now()
+                ]);
+
+            // Mettre à jour les informations dans la session
+            $user['nom'] = $validated['nom'];
+            $user['prenom'] = $validated['prenom'];
+            $user['email'] = $validated['email'];
+            $user['telephone'] = $validated['telephone'];
 
             // Si un nouveau mot de passe est fourni, le mettre à jour
-            if ($request->input('motdepasse')) {
-                $user['motdepasse'] = bcrypt($request->input('motdepasse'));
+            if (!empty($validated['motdepasse'])) {
+                $user['motdepasse'] = bcrypt($validated['motdepasse']);
+                DB::table('users')
+                    ->where('id', $user['id'])
+                    ->update(['motdepasse' => bcrypt($validated['motdepasse'])]);
             }
 
             // Mettre à jour la session
@@ -173,6 +196,7 @@ class LivreurController extends Controller
                 'message' => 'Profil mis à jour avec succès'
             ]);
         } catch (\Exception $e) {
+            \Log::error('Erreur lors de la mise à jour du profil: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du profil: ' . $e->getMessage()

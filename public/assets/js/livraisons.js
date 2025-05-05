@@ -330,10 +330,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialiser la page
     loadDeliveries()
   
-    // Ajouter les écouteurs d'événements
-    document.getElementById("searchButton").addEventListener("click", filterDeliveries)
-    document.getElementById("searchInput").addEventListener("input", filterDeliveries)
-    document.getElementById("statusFilter").addEventListener("change", filterDeliveries)
+    // Ajouter les écouteurs d'événements après que le DOM soit chargé
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchButton = document.getElementById("searchButton")
+      const searchInput = document.getElementById("searchInput")
+      const statusFilter = document.getElementById("statusFilter")
+
+      if (searchButton) searchButton.addEventListener("click", filterDeliveries)
+      if (searchInput) searchInput.addEventListener("input", filterDeliveries)
+      if (statusFilter) statusFilter.addEventListener("change", filterDeliveries)
+    })
   
     // Ces fonctions seraient connectées à un backend dans une application réelle
     window.startDelivery = (id) => {
