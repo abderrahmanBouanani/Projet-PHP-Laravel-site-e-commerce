@@ -86,6 +86,7 @@ class AdminOrderController extends Controller
    {
        $searchTerm = $request->input('search', '');
        $sort = $request->input('sort', 'date-desc');
+       $status = $request->input('status', 'all');
        
        $query = Commande::with(['client']);
        
@@ -99,6 +100,11 @@ class AdminOrderController extends Controller
                      ->orWhere('prenom', 'like', "%{$searchTerm}%");
                });
            }
+       }
+       
+       // Filtrer par statut
+       if ($status !== 'all') {
+           $query->where('statut', $status);
        }
        
        // Appliquer le tri

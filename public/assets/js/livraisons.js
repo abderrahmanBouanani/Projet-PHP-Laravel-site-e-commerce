@@ -114,23 +114,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     function filterDeliveries() {
-      const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+      const searchTerm = document.getElementById("searchInput").value;
       const statusFilter = document.getElementById("statusFilter").value;
-      const rows = document.querySelectorAll("tbody tr");
-
-      rows.forEach(row => {
-        const id = row.querySelector("td:first-child").textContent;
-        const address = row.querySelector("td:nth-child(2)").textContent.toLowerCase();
-        const status = row.querySelector("td:nth-child(4) .badge").textContent.trim();
-
-        const matchesSearch = id.includes(searchTerm) || address.includes(searchTerm);
-        const matchesStatus = statusFilter === "all" || 
-          (statusFilter === "Confirmée" && status === "En attente") ||
-          (statusFilter === "En cours de livraison" && status === "En cours") ||
-          (statusFilter === "Livrée" && status === "Livrée");
-
-        row.style.display = matchesSearch && matchesStatus ? "" : "none";
-      });
+      
+      // Appel à l'API de recherche
+      fetch(`/api/livreur/livraison/search?search=${searchTerm}&status=${statusFilter}`)
+        .then(response => response.json())
+        .then(data => {
+          displayDeliveries(data);
+        })
+        .catch(error => {
+          console.error('Error searching deliveries:', error);
+        });
     }
   
     // Fonction pour mettre à jour le statut d'une commande
@@ -330,10 +325,16 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialiser la page
     loadDeliveries()
   
-    // Ajouter les écouteurs d'événements
-    document.getElementById("searchButton").addEventListener("click", filterDeliveries)
-    document.getElementById("searchInput").addEventListener("input", filterDeliveries)
-    document.getElementById("statusFilter").addEventListener("change", filterDeliveries)
+    // Ajouter les écouteurs d'événements après que le DOM soit chargé
+    document.addEventListener('DOMContentLoaded', function() {
+      const searchButton = document.getElementById("searchButton")
+      const searchInput = document.getElementById("searchInput")
+      const statusFilter = document.getElementById("statusFilter")
+
+      if (searchButton) searchButton.addEventListener("click", filterDeliveries)
+      if (searchInput) searchInput.addEventListener("input", filterDeliveries)
+      if (statusFilter) statusFilter.addEventListener("change", filterDeliveries)
+    })
   
     // Ces fonctions seraient connectées à un backend dans une application réelle
     window.startDelivery = (id) => {

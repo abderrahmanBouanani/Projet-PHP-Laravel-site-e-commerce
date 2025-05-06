@@ -34,9 +34,4 @@ class Commande extends Model
    {
        return $this->hasOne(Facturation::class);
    }
-
-   public function livraison()
-   {
-       return $this->hasOne(Livraison::class);
-   }
 }

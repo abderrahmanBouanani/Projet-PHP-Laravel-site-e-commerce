@@ -186,7 +186,16 @@ Route::post('/livreur/commande/{id}/update-status', [LivreurController::class, '
 Route::get('/livreur/commande/{id}/produits', [LivreurController::class, 'getProducts']);
 
 Route::get('/livreur_profile',function(){
-    return view('delivery interface.profil-livreur',['user' => session('user')]);
+    return view('livreur-interface.profil-livreur',['user' => session('user')]);
 });
 
 Route::post('/livreur/profile/update', [LivreurController::class, 'updateProfile']);
+
+// Routes pour le livreur
+Route::post('/livreur/update-profile', [LivreurController::class, 'updateProfile'])->name('livreur.updateProfile');
+
+// Routes API pour la recherche
+Route::get('/api/admin/commande/search', [AdminOrderController::class, 'search']);
+Route::get('/api/admin/produit/search', [AdminProductController::class, 'search']);
+Route::get('/api/livreur/livraison/search', [LivreurController::class, 'search']);
+Route::get('/api/admin/users/search', [AdminUserController::class, 'search']);

@@ -367,12 +367,12 @@ function displayCartItemsWithoutSession() {
   // Fonction pour déterminer la méthode de paiement sélectionnée
   function getSelectedPaymentMethod() {
     if (document.querySelector("#collapsebank.show")) {
-      return "bank_transfer"
+      return "espece";
     } else if (document.querySelector("#collapsepaypal.show")) {
-      return "paypal"
+      return "carte"; // ou "paypal" si tu veux gérer ce cas plus tard
     } else {
       // Méthode par défaut
-      return "bank_transfer"
+      return "espece";
     }
   }
   

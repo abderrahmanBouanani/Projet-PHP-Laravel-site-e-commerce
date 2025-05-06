@@ -163,7 +163,7 @@
             if (response.success && response.data) {
               renderOrdersChart(response.data.orders);
               renderRevenueChart(response.data.monthly_sales);
-              renderCategoriesChart(response.data.top_products);
+              renderCategoriesChart(response.data.category_distribution);
               renderUserStatsChart([
                 { name: 'Clients', data: [{{ $stats['clients'] }}] },
                 { name: 'Vendeurs', data: [{{ $stats['vendeurs'] }}] }
@@ -314,13 +314,20 @@
       }
 
       function renderCategoriesChart(categoryData) {
-        const categoriesChartOptions = {
+        const categoriesChart = new ApexCharts(document.querySelector("#categoriesChart"), {
           series: categoryData.data,
           chart: {
-            type: "pie",
-            height: 300,
+            type: "donut",
+            height: 300
           },
           labels: categoryData.labels,
+          title: {
+            text: "Distribution des Catégories",
+            align: "center"
+          },
+          legend: {
+            position: "bottom"
+          },
           colors: [
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-1"
@@ -337,12 +344,10 @@
             getComputedStyle(document.documentElement).getPropertyValue(
               "--chart-color-5"
             ) || "#fd7e14",
-          ],
-        };
-        new ApexCharts(
-          document.querySelector("#categoriesChart"),
-          categoriesChartOptions
-        ).render();
+          ]
+        });
+
+        categoriesChart.render();
       }
 
       function renderUserStatsChart(userStats) {

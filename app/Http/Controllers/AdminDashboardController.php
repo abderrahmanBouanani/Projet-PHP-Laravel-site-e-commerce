@@ -89,6 +89,21 @@ class AdminDashboardController extends Controller
                 ->take(5)
                 ->get();
 
+            // Get category distribution
+            $categoryDistribution = DB::table('produits')
+                ->select(
+                    'categorie',
+                    DB::raw('COUNT(*) as total_products')
+                )
+                ->groupBy('categorie')
+                ->get();
+
+            // Format category data for pie chart
+            $categoryLabels = $categoryDistribution->pluck('categorie')->toArray();
+            $categoryData = $categoryDistribution->pluck('total_products')->map(function ($value) {
+                return (int)$value;
+            })->toArray();
+
             // Format product data for pie chart
             $productLabels = $topProducts->pluck('nom')->toArray();
             $productData = $topProducts->pluck('total_sold')->map(function ($value) {
@@ -109,6 +124,10 @@ class AdminDashboardController extends Controller
                     'top_products' => [
                         'labels' => $productLabels,
                         'data' => $productData
+                    ],
+                    'category_distribution' => [
+                        'labels' => $categoryLabels,
+                        'data' => $categoryData
                     ]
                 ]
             ]);

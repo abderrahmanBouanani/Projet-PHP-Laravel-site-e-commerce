@@ -12,7 +12,6 @@
         <div class="user-info-card">
           <h2 class="text-center mb-4">Informations de votre compte</h2>
           <div id="userInfo" class="row">
-            <!-- Les informations de l'utilisateur seront affichées ici -->
             @if(session('user'))
               <div class="col-md-6 mb-3">
                 <div class="user-info-item">
@@ -48,116 +47,42 @@
               <p class="text-center">Aucune information disponible. Veuillez vous connecter d'abord.</p>
             @endif
           </div>
-          <div class="text-center mt-4">
-            <button id="editProfileBtn" class="btn btn-edit">
-              Modifier le profil
-            </button>
-          </div>
         </div>
       </div>
-    </div>
+</div>
 
-    <!-- Modal pour modifier le profil -->
-    <div
-      class="modal fade"
-      id="editProfileModal"
-      tabindex="-1"
-      aria-labelledby="editProfileModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="editProfileModalLabel">
-              Modifier le profil
-            </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body">
-            <form id="editProfileForm" action="{{ url('/admin/about') }}" method="POST">
-              @csrf
-              <div class="mb-3">
-                <label for="editNom" class="form-label">Nom</label>
-                <input type="text" class="form-control" id="editNom" name="nom" value="{{ session('user')['nom'] ?? '' }}" required />
-              </div>
-              <div class="mb-3">
-                <label for="editPrenom" class="form-label">Prénom</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="editPrenom"
-                  name="prenom"
-                  value="{{ session('user')['prenom'] ?? '' }}"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="editEmail" class="form-label">Email</label>
-                <input
-                  type="email"
-                  class="form-control"
-                  id="editEmail"
-                  name="email"
-                  value="{{ session('user')['email'] ?? '' }}"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="editTelephone" class="form-label">Téléphone</label>
-                <input
-                  type="tel"
-                  class="form-control"
-                  id="editTelephone"
-                  name="telephone"
-                  value="{{ session('user')['telephone'] ?? '' }}"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <label for="editMotDePasse" class="form-label"
-                  >Nouveau mot de passe (laisser vide si inchangé)</label
-                >
-                <input
-                  type="password"
-                  class="form-control"
-                  id="editMotDePasse"
-                  name="password"
-                />
-              </div>
-              <div class="modal-footer">
-                <button
-                  type="button"
-                  class="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Annuler
-                </button>
-                <button
-                  type="submit"
-                  class="btn btn-primary"
-                  id="saveProfileChanges"
-                >
-                  Enregistrer
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
+<style>
+    .user-info-card {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 40px;
+    }
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", function() {
-        // Gérer l'ouverture du modal d'édition
-        document.getElementById("editProfileBtn").addEventListener("click", function() {
-          new bootstrap.Modal(document.getElementById("editProfileModal")).show();
-        });
-      });
-    </script>
-@endsection <!-- Ici finit le contenu spécifique à cette page -->
+    .user-info-card h2 {
+        font-size: 24px;
+        font-weight: bold;
+        color: #343a40;
+        margin-bottom: 30px;
+    }
+
+    .user-info-item {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .user-info-label {
+        font-weight: 600;
+        color: #495057;
+        margin-right: 10px;
+    }
+
+    .user-info-value {
+        color: #212529;
+    }
+</style>
+@endsection

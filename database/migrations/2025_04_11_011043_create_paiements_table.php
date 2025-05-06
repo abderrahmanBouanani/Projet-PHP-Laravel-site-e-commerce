@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('commande_id')->constrained();
             $table->float('montant');
-            $table->string('type'); // 'carte' ou 'paypal'
+            $table->string('type')->nullable(); // Correspondra à la méthode de paiement de la commande
             $table->string('numero_carte')->nullable();
             $table->string('date_expiration')->nullable();
             $table->string('email_paypal')->nullable();
